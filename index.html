@@ -295,9 +295,10 @@
             padding: 5px;
             margin-bottom: 20px;
             box-shadow: var(--shadow-md);
-            overflow-x: auto;
+            overflow: visible;
             flex-wrap: nowrap;
             border: 1px solid var(--border-light);
+            gap: 5px;
         }
 
         .nav-tab {
@@ -335,17 +336,25 @@
         /* Dropdown Navigation Styles */
         .nav-dropdown {
             position: relative;
-            display: inline-block;
+            flex: 1;
         }
 
         .nav-dropdown .dropdown-trigger {
             cursor: pointer;
             user-select: none;
+            white-space: nowrap !important;
+            max-width: none;
+        }
+
+        .nav-dropdown .nav-tab {
+            flex: none;
         }
 
         .nav-dropdown .dropdown-content {
             display: none;
             position: absolute;
+            top: 100%;
+            left: 0;
             background: var(--bg-secondary);
             min-width: 250px;
             box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
