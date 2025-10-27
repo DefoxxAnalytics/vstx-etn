@@ -13767,6 +13767,14 @@
 
             // Add active class to clicked nav tab
             event.target.classList.add('active');
+
+            // Trigger YoY comparison when YoY tab is clicked
+            if (tabName === 'yoycomparison' && seasonalityAnalytics && seasonalityAnalytics.availableYears && seasonalityAnalytics.availableYears.length >= 2) {
+                console.log('YoY tab activated - triggering comparison');
+                setTimeout(() => {
+                    applyYoYComparison();
+                }, 100); // Small delay to ensure DOM is ready
+            }
         }
 
         // Alert tab switching function for maverick spend
