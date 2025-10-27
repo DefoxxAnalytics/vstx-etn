@@ -332,6 +332,54 @@
             box-shadow: var(--shadow-sm);
         }
 
+        /* Dropdown Navigation Styles */
+        .nav-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .nav-dropdown .dropdown-trigger {
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .nav-dropdown .dropdown-content {
+            display: none;
+            position: absolute;
+            background: var(--bg-secondary);
+            min-width: 250px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            border-radius: 10px;
+            padding: 8px 0;
+            margin-top: 5px;
+            border: 1px solid var(--border-light);
+        }
+
+        .nav-dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        .dropdown-item {
+            padding: 12px 20px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: var(--text-secondary);
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .dropdown-item:hover {
+            background: var(--bg-hover);
+            color: var(--text-tertiary);
+        }
+
+        .dropdown-item.active {
+            background: var(--accent-secondary);
+            color: var(--text-white);
+            font-weight: 600;
+        }
+
         .tab-content {
             display: none;
         }
@@ -6263,20 +6311,50 @@
         <div class="dashboard" id="dashboard">
             <!-- Navigation Tabs -->
             <div class="nav-tabs">
+                <!-- Stand-alone -->
                 <div class="nav-tab active" onclick="showTab('overview')">Overview</div>
-                <div class="nav-tab" onclick="showTab('categories')">Categories Analysis</div>
-                <div class="nav-tab" onclick="showTab('suppliers')">Suppliers Analysis</div>
-                <div class="nav-tab" onclick="showTab('pareto')">Pareto Analysis</div>
-                <div class="nav-tab" onclick="showTab('stratification')"> Spend Stratification</div>
-                <div class="nav-tab" onclick="showTab('seasonality')">Seasonality Intelligence</div>
-                <div class="nav-tab" onclick="showTab('yoycomparison')">📅 Year-over-Year Comparison</div>
-                <div class="nav-tab" onclick="showTab('tailspend')">Tail Spend Analysis</div>
-                <div class="nav-tab" onclick="showTab('aiInsights')">🤖 AI Insights</div>
-                <div class="nav-tab" onclick="showTab('predictive')">Predictive Analytics (under review)</div>
-                <div class="nav-tab" onclick="showTab('maverick')">Maverick Spend & Compliance (under review)</div>
-                <div class="nav-tab" onclick="showTab('contracts')">Contract Optimization Intelligence (under review)
+
+                <!-- Core Analytics Dropdown -->
+                <div class="nav-dropdown">
+                    <div class="nav-tab dropdown-trigger">Core Analytics ▼</div>
+                    <div class="dropdown-content">
+                        <div class="dropdown-item" onclick="showTab('categories')">Categories Analysis</div>
+                        <div class="dropdown-item" onclick="showTab('suppliers')">Suppliers Analysis</div>
+                        <div class="dropdown-item" onclick="showTab('pareto')">Pareto Analysis</div>
+                        <div class="dropdown-item" onclick="showTab('stratification')">Spend Stratification</div>
+                    </div>
                 </div>
-                <div class="nav-tab" onclick="showTab('settings')">⚙️ Settings</div>
+
+                <!-- Temporal Analysis Dropdown -->
+                <div class="nav-dropdown">
+                    <div class="nav-tab dropdown-trigger">Temporal Analysis ▼</div>
+                    <div class="dropdown-content">
+                        <div class="dropdown-item" onclick="showTab('seasonality')">Seasonality Intelligence</div>
+                        <div class="dropdown-item" onclick="showTab('yoycomparison')">Year-over-Year Comparison</div>
+                    </div>
+                </div>
+
+                <!-- Strategic Intelligence Dropdown -->
+                <div class="nav-dropdown">
+                    <div class="nav-tab dropdown-trigger">Strategic Intelligence ▼</div>
+                    <div class="dropdown-content">
+                        <div class="dropdown-item" onclick="showTab('tailspend')">Tail Spend Analysis</div>
+                        <div class="dropdown-item" onclick="showTab('aiInsights')">AI Insights</div>
+                        <div class="dropdown-item" onclick="showTab('predictive')">Predictive Analytics</div>
+                        <div class="dropdown-item" onclick="showTab('contracts')">Contract Optimization Intelligence</div>
+                    </div>
+                </div>
+
+                <!-- Risk & Compliance Dropdown -->
+                <div class="nav-dropdown">
+                    <div class="nav-tab dropdown-trigger">Risk & Compliance ▼</div>
+                    <div class="dropdown-content">
+                        <div class="dropdown-item" onclick="showTab('maverick')">Maverick Spend & Compliance</div>
+                    </div>
+                </div>
+
+                <!-- Configuration -->
+                <div class="nav-tab" onclick="showTab('settings')">Settings</div>
             </div>
 
             <!-- Filters -->
@@ -13753,10 +13831,14 @@
                 tab.classList.remove('active');
             });
 
-            // Remove active class from all nav tabs
-            const navTabs = document.querySelectorAll('.nav-tab');
+            // Remove active class from all nav tabs and dropdown items
+            const navTabs = document.querySelectorAll('.nav-tab:not(.dropdown-trigger)');
             navTabs.forEach(tab => {
                 tab.classList.remove('active');
+            });
+            const dropdownItems = document.querySelectorAll('.dropdown-item');
+            dropdownItems.forEach(item => {
+                item.classList.remove('active');
             });
 
             // Show selected tab content
@@ -13765,8 +13847,14 @@
                 selectedTab.classList.add('active');
             }
 
-            // Add active class to clicked nav tab
-            event.target.classList.add('active');
+            // Add active class to clicked element (nav-tab or dropdown-item)
+            if (event && event.target) {
+                if (event.target.classList.contains('dropdown-item')) {
+                    event.target.classList.add('active');
+                } else if (event.target.classList.contains('nav-tab')) {
+                    event.target.classList.add('active');
+                }
+            }
 
             // Trigger YoY comparison when YoY tab is clicked
             if (tabName === 'yoycomparison' && seasonalityAnalytics && seasonalityAnalytics.availableYears && seasonalityAnalytics.availableYears.length >= 2) {
