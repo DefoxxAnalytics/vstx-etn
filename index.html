@@ -6269,6 +6269,7 @@
                 <div class="nav-tab" onclick="showTab('pareto')">Pareto Analysis</div>
                 <div class="nav-tab" onclick="showTab('stratification')"> Spend Stratification</div>
                 <div class="nav-tab" onclick="showTab('seasonality')">Seasonality Intelligence</div>
+                <div class="nav-tab" onclick="showTab('yoycomparison')">📅 Year-over-Year Comparison</div>
                 <div class="nav-tab" onclick="showTab('tailspend')">Tail Spend Analysis</div>
                 <div class="nav-tab" onclick="showTab('aiInsights')">🤖 AI Insights</div>
                 <div class="nav-tab" onclick="showTab('predictive')">Predictive Analytics (under review)</div>
@@ -6496,6 +6497,37 @@
                     </div>
                 </div>
 
+                <!-- Year Selection Controls -->
+                <div class="year-selector-container" id="yearSelectorContainer" style="display: none; margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px;">
+                    <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
+                        <label style="font-weight: bold; color: #495057;">
+                            View Mode:
+                        </label>
+                        <div class="btn-group" role="group">
+                            <button type="button" class="btn btn-sm btn-primary" id="viewAllYears" onclick="setSeasonalityView('all')" style="padding: 5px 15px; margin-right: 5px;">
+                                All Years
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-primary" id="viewFY2024" onclick="setSeasonalityView(2024)" style="padding: 5px 15px; margin-right: 5px;">
+                                FY2024
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-primary" id="viewFY2025" onclick="setSeasonalityView(2025)" style="padding: 5px 15px; margin-right: 5px;">
+                                FY2025
+                            </button>
+                        </div>
+
+                        <div style="margin-left: auto; display: flex; align-items: center; gap: 10px;">
+                            <label style="font-weight: bold; color: #495057;">
+                                <input type="checkbox" id="useFiscalYear" checked onchange="toggleFiscalYear(this.checked)">
+                                Use Fiscal Year (Jul-Jun)
+                            </label>
+                        </div>
+                    </div>
+
+                    <div id="yearStatsDisplay" style="margin-top: 10px; font-size: 0.9rem; color: #6c757d;">
+                        <!-- Year statistics will be displayed here -->
+                    </div>
+                </div>
+
                 <!-- Seasonality Charts -->
                 <div class="seasonality-chart-container" id="seasonalityCharts" style="display: none;">
                     <h3>📊 Seasonal Patterns Analysis</h3>
@@ -6517,6 +6549,121 @@
                         opportunities.</p>
                     <p style="margin-top: 15px; font-size: 0.9rem;">
                         <strong>Required columns:</strong> Date, Amount, Category, Supplier
+                    </p>
+                </div>
+            </div>
+
+            <!-- Year-over-Year Comparison Tab -->
+            <div id="yoycomparison" class="tab-content">
+                <!-- Year Selector Controls -->
+                <div class="yoy-selector-container" style="margin-bottom: 20px; padding: 20px; background: #f8f9fa; border-radius: 8px;">
+                    <div style="display: flex; align-items: center; gap: 20px; flex-wrap: wrap;">
+                        <label style="font-weight: bold; color: #495057; font-size: 1.1rem;">
+                            Compare Fiscal Years:
+                        </label>
+                        <select id="yoyYear1" class="form-control" style="width: 150px; display: inline-block;">
+                            <option value="2024">FY2024</option>
+                            <option value="2025" selected>FY2025</option>
+                        </select>
+                        <span style="font-size: 1.2rem; font-weight: bold;">vs</span>
+                        <select id="yoyYear2" class="form-control" style="width: 150px; display: inline-block;">
+                            <option value="2024" selected>FY2024</option>
+                            <option value="2025">FY2025</option>
+                        </select>
+                        <button onclick="applyYoYComparison()" class="btn btn-primary" style="padding: 8px 20px;">
+                            Apply Comparison
+                        </button>
+                        <button onclick="swapYoYYears()" class="btn btn-outline-secondary" style="padding: 8px 20px;">
+                            Swap Years
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Key Metrics Comparison -->
+                <div class="yoy-metrics-section" style="margin-bottom: 30px;">
+                    <h3 style="margin-bottom: 20px; color: #2c3e50;">📊 Key Metrics Comparison</h3>
+                    <div id="yoyMetricsCards" class="yoy-metrics-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+                        <!-- Metrics cards will be populated here -->
+                    </div>
+                </div>
+
+                <!-- Category Comparison Section -->
+                <div class="yoy-category-section" style="margin-bottom: 30px;">
+                    <h3 style="margin-bottom: 20px; color: #2c3e50;">📈 Category Comparison</h3>
+
+                    <!-- Distribution Pie Charts Side-by-Side -->
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 30px;">
+                        <div class="chart-wrapper" style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                            <h4 id="yoyPie1Title" style="text-align: center; color: #495057; margin-bottom: 15px;">FY2024 Distribution</h4>
+                            <canvas id="yoyPieChart1" style="max-height: 300px;"></canvas>
+                        </div>
+                        <div class="chart-wrapper" style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                            <h4 id="yoyPie2Title" style="text-align: center; color: #495057; margin-bottom: 15px;">FY2025 Distribution</h4>
+                            <canvas id="yoyPieChart2" style="max-height: 300px;"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Category Growth Bar Chart -->
+                    <div class="chart-wrapper" style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                        <h4 style="text-align: center; color: #495057; margin-bottom: 15px;">Category Growth Analysis (Sorted by Growth %)</h4>
+                        <canvas id="yoyCategoryGrowthChart" style="max-height: 400px;"></canvas>
+                    </div>
+                </div>
+
+                <!-- Monthly Comparison Section -->
+                <div class="yoy-monthly-section" style="margin-bottom: 30px;">
+                    <h3 style="margin-bottom: 20px; color: #2c3e50;">📅 Monthly Spending Comparison</h3>
+
+                    <!-- Side-by-Side Line Chart -->
+                    <div class="chart-wrapper" style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 20px;">
+                        <canvas id="yoyMonthlyLineChart" style="max-height: 400px;"></canvas>
+                    </div>
+
+                    <!-- Monthly Growth Rate Bar Chart -->
+                    <div class="chart-wrapper" style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                        <h4 style="text-align: center; color: #495057; margin-bottom: 15px;">Month-over-Month Growth Rate</h4>
+                        <canvas id="yoyMonthlyGrowthChart" style="max-height: 300px;"></canvas>
+                    </div>
+                </div>
+
+                <!-- Top Movers Section -->
+                <div class="yoy-movers-section" style="margin-bottom: 30px;">
+                    <h3 style="margin-bottom: 20px; color: #2c3e50;">🔝 Top Movers</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+                        <!-- Top Gainers -->
+                        <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                            <h4 style="color: #28a745; margin-bottom: 15px;">📈 Top Gainers</h4>
+                            <div id="yoyTopGainers">
+                                <!-- Will be populated by JavaScript -->
+                            </div>
+                        </div>
+                        <!-- Top Decliners -->
+                        <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                            <h4 style="color: #dc3545; margin-bottom: 15px;">📉 Top Decliners</h4>
+                            <div id="yoyTopDecliners">
+                                <!-- Will be populated by JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Supplier Comparison Section -->
+                <div class="yoy-supplier-section" style="margin-bottom: 30px;">
+                    <h3 style="margin-bottom: 20px; color: #2c3e50;">🏢 Top Suppliers Comparison</h3>
+                    <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                        <div id="yoySupplierTable" style="overflow-x: auto;">
+                            <!-- Table will be populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- No Data Message -->
+                <div class="seasonality-ready" id="noYoYMessage" style="display: none;">
+                    <div style="font-size: 3rem; margin-bottom: 20px;">📅</div>
+                    <h3>Year-over-Year Comparison Ready</h3>
+                    <p>Upload procurement data spanning multiple fiscal years to see year-over-year comparisons.</p>
+                    <p style="margin-top: 15px; font-size: 0.9rem;">
+                        <strong>Note:</strong> At least 2 fiscal years of data required for comparison.
                     </p>
                 </div>
             </div>
@@ -7524,15 +7671,66 @@
 
         // Seasonality Analysis Class
         class SeasonalityAnalyzer {
-            constructor() {
-                this.monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+            constructor(fiscalYearStart = 7) {  // Default: July
+                // Calendar month names
+                this.calendarMonthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
                     'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+                // Keep monthNames for backward compatibility
+                this.monthNames = this.calendarMonthNames;
+
+                // Fiscal year configuration
+                this.fiscalYearStart = fiscalYearStart;
+                this.fiscalMonthNames = this.generateFiscalMonthNames(fiscalYearStart);
+
+                // Season names (adjust for fiscal year if needed)
                 this.seasonNames = {
                     'Winter': [12, 1, 2],
                     'Spring': [3, 4, 5],
                     'Summer': [6, 7, 8],
                     'Fall': [9, 10, 11]
                 };
+
+                // Multi-year tracking
+                this.availableYears = [];
+                this.fiscalYearMap = {}; // Maps calendar dates to fiscal years
+            }
+
+            // Generate fiscal month labels
+            generateFiscalMonthNames(startMonth) {
+                const names = [...this.calendarMonthNames];
+                const fiscalNames = [];
+
+                for (let i = 0; i < 12; i++) {
+                    const monthIndex = ((startMonth - 1 + i) % 12);
+                    fiscalNames.push(names[monthIndex]);
+                }
+
+                return fiscalNames;
+            }
+
+            // Determine fiscal year from date
+            getFiscalYear(date) {
+                const d = new Date(date);
+                const calendarMonth = d.getMonth() + 1;  // 1-12
+                const calendarYear = d.getFullYear();
+
+                // If month >= fiscal year start, it's current calendar year's fiscal year
+                // Otherwise, it's previous calendar year's fiscal year
+                if (calendarMonth >= this.fiscalYearStart) {
+                    return calendarYear + 1;  // FY starts in middle of calendar year
+                } else {
+                    return calendarYear;
+                }
+            }
+
+            // Convert calendar month to fiscal month
+            calendarToFiscalMonth(calendarMonth) {
+                if (calendarMonth >= this.fiscalYearStart) {
+                    return calendarMonth - this.fiscalYearStart + 1;
+                } else {
+                    return calendarMonth + (12 - this.fiscalYearStart + 1);
+                }
             }
 
             // Calculate seasonal indices for each category
@@ -7617,6 +7815,229 @@
                 };
             }
 
+            // Calculate seasonal indices with multi-year support
+            calculateSeasonalIndicesMultiYear(data, category, useCalendarYear = false) {
+                const categoryData = data.filter(row => row.category === category);
+                if (categoryData.length < 12) return null;
+
+                // Identify all fiscal years in the data
+                const fiscalYears = [...new Set(categoryData.map(row => {
+                    return useCalendarYear ? new Date(row.date).getFullYear() : this.getFiscalYear(row.date);
+                }))].sort();
+
+                this.availableYears = fiscalYears;
+
+                // Initialize data structure: year → fiscal month → data
+                const yearMonthlyData = {};
+                fiscalYears.forEach(year => {
+                    yearMonthlyData[year] = {};
+                    for (let month = 1; month <= 12; month++) {
+                        yearMonthlyData[year][month] = {
+                            spend: 0,
+                            count: 0,
+                            transactions: 0
+                        };
+                    }
+                });
+
+                // Aggregate data by fiscal year and fiscal month
+                categoryData.forEach(row => {
+                    const date = new Date(row.date);
+                    const fiscalYear = useCalendarYear ? date.getFullYear() : this.getFiscalYear(row.date);
+                    const calendarMonth = date.getMonth() + 1;
+                    const fiscalMonth = useCalendarYear ? calendarMonth : this.calendarToFiscalMonth(calendarMonth);
+
+                    if (yearMonthlyData[fiscalYear] && yearMonthlyData[fiscalYear][fiscalMonth]) {
+                        yearMonthlyData[fiscalYear][fiscalMonth].spend += row.amount;
+                        yearMonthlyData[fiscalYear][fiscalMonth].count++;
+                        yearMonthlyData[fiscalYear][fiscalMonth].transactions += row.transactions || 1;
+                    }
+                });
+
+                // Calculate per-year seasonal indices
+                const yearlyResults = {};
+                let totalSpendAllYears = 0;
+
+                fiscalYears.forEach(year => {
+                    const yearData = yearMonthlyData[year];
+                    const yearTotalSpend = Object.values(yearData).reduce((sum, m) => sum + m.spend, 0);
+                    totalSpendAllYears += yearTotalSpend;
+
+                    const avgMonthlySpend = yearTotalSpend / 12;
+                    const seasonalIndices = {};
+
+                    for (let month = 1; month <= 12; month++) {
+                        const monthlySpend = yearData[month].spend;
+                        const index = avgMonthlySpend > 0 ? (monthlySpend / avgMonthlySpend) * 100 : 100;
+
+                        seasonalIndices[month] = {
+                            index: index,
+                            spend: monthlySpend,
+                            count: yearData[month].count,
+                            transactions: yearData[month].transactions,
+                            percentage: yearTotalSpend > 0 ? (monthlySpend / yearTotalSpend) * 100 : 0
+                        };
+                    }
+
+                    // Calculate seasonality strength for this year
+                    const indices = Object.values(seasonalIndices).map(d => d.index);
+                    const mean = indices.reduce((sum, val) => sum + val, 0) / indices.length;
+                    const variance = indices.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / indices.length;
+                    const stdDev = Math.sqrt(variance);
+                    const seasonalityStrength = (stdDev / mean) * 100;
+
+                    // Find peak and low months for this year
+                    let maxIndex = 0, minIndex = Infinity;
+                    let maxMonth = 1, minMonth = 1;
+
+                    for (let month = 1; month <= 12; month++) {
+                        const idx = seasonalIndices[month].index;
+                        if (idx > maxIndex) {
+                            maxIndex = idx;
+                            maxMonth = month;
+                        }
+                        if (idx < minIndex) {
+                            minIndex = idx;
+                            minMonth = month;
+                        }
+                    }
+
+                    yearlyResults[year] = {
+                        fiscalYear: year,
+                        seasonalIndices: seasonalIndices,
+                        seasonalityStrength: seasonalityStrength,
+                        peakMonth: maxMonth,
+                        lowMonth: minMonth,
+                        peakIndex: maxIndex,
+                        lowIndex: minIndex,
+                        totalSpend: yearTotalSpend,
+                        dataPoints: Object.values(yearData).reduce((sum, m) => sum + m.count, 0)
+                    };
+                });
+
+                // Calculate average seasonal pattern across all years
+                const avgSeasonalIndices = {};
+                for (let month = 1; month <= 12; month++) {
+                    let totalIndex = 0;
+                    let totalSpend = 0;
+                    let totalCount = 0;
+                    let totalTransactions = 0;
+                    let yearCount = 0;
+
+                    fiscalYears.forEach(year => {
+                        if (yearlyResults[year].seasonalIndices[month]) {
+                            totalIndex += yearlyResults[year].seasonalIndices[month].index;
+                            totalSpend += yearlyResults[year].seasonalIndices[month].spend;
+                            totalCount += yearlyResults[year].seasonalIndices[month].count;
+                            totalTransactions += yearlyResults[year].seasonalIndices[month].transactions;
+                            yearCount++;
+                        }
+                    });
+
+                    avgSeasonalIndices[month] = {
+                        index: yearCount > 0 ? totalIndex / yearCount : 100,
+                        spend: totalSpend,
+                        count: totalCount,
+                        transactions: totalTransactions,
+                        percentage: totalSpendAllYears > 0 ? (totalSpend / totalSpendAllYears) * 100 : 0
+                    };
+                }
+
+                // Calculate overall seasonality strength
+                const avgIndices = Object.values(avgSeasonalIndices).map(d => d.index);
+                const avgMean = avgIndices.reduce((sum, val) => sum + val, 0) / avgIndices.length;
+                const avgVariance = avgIndices.reduce((sum, val) => sum + Math.pow(val - avgMean, 2), 0) / avgIndices.length;
+                const avgStdDev = Math.sqrt(avgVariance);
+                const avgSeasonalityStrength = (avgStdDev / avgMean) * 100;
+
+                // Find overall peak and low months
+                let maxIndex = 0, minIndex = Infinity;
+                let maxMonth = 1, minMonth = 1;
+
+                for (let month = 1; month <= 12; month++) {
+                    const idx = avgSeasonalIndices[month].index;
+                    if (idx > maxIndex) {
+                        maxIndex = idx;
+                        maxMonth = month;
+                    }
+                    if (idx < minIndex) {
+                        minIndex = idx;
+                        minMonth = month;
+                    }
+                }
+
+                return {
+                    category: category,
+                    multiYear: true,
+                    fiscalYears: fiscalYears,
+                    yearlyResults: yearlyResults,
+
+                    // Average across all years (backward compatible)
+                    seasonalIndices: avgSeasonalIndices,
+                    seasonalityStrength: avgSeasonalityStrength,
+                    peakMonth: maxMonth,
+                    lowMonth: minMonth,
+                    peakIndex: maxIndex,
+                    lowIndex: minIndex,
+                    totalSpend: totalSpendAllYears,
+                    dataPoints: categoryData.length,
+
+                    // Year-over-year analysis
+                    yoyGrowth: this.calculateYoYGrowth(yearlyResults, fiscalYears),
+                    trendDirection: this.calculateTrendDirection(yearlyResults, fiscalYears)
+                };
+            }
+
+            // Calculate year-over-year growth
+            calculateYoYGrowth(yearlyResults, fiscalYears) {
+                if (fiscalYears.length < 2) return null;
+
+                const yoyChanges = [];
+
+                for (let i = 1; i < fiscalYears.length; i++) {
+                    const currentYear = fiscalYears[i];
+                    const previousYear = fiscalYears[i - 1];
+
+                    const currentSpend = yearlyResults[currentYear].totalSpend;
+                    const previousSpend = yearlyResults[previousYear].totalSpend;
+
+                    const growthRate = previousSpend > 0
+                        ? ((currentSpend - previousSpend) / previousSpend) * 100
+                        : 0;
+
+                    yoyChanges.push({
+                        fromYear: previousYear,
+                        toYear: currentYear,
+                        growthRate: growthRate,
+                        previousSpend: previousSpend,
+                        currentSpend: currentSpend,
+                        absoluteChange: currentSpend - previousSpend
+                    });
+                }
+
+                return yoyChanges;
+            }
+
+            // Calculate overall trend direction
+            calculateTrendDirection(yearlyResults, fiscalYears) {
+                if (fiscalYears.length < 2) return 'insufficient_data';
+
+                const spends = fiscalYears.map(year => yearlyResults[year].totalSpend);
+
+                // Simple linear regression slope
+                const n = spends.length;
+                const sumX = fiscalYears.reduce((sum, year, i) => sum + i, 0);
+                const sumY = spends.reduce((sum, spend) => sum + spend, 0);
+                const sumXY = fiscalYears.reduce((sum, year, i) => sum + (i * spends[i]), 0);
+                const sumX2 = fiscalYears.reduce((sum, year, i) => sum + (i * i), 0);
+
+                const slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
+
+                if (slope > 0.05) return 'increasing';
+                if (slope < -0.05) return 'decreasing';
+                return 'stable';
+            }
+
             // Identify optimization opportunities
             identifyOpportunities(seasonalityResults) {
                 const opportunities = [];
@@ -7674,14 +8095,34 @@
                 return opportunities;
             }
 
-            // Analyze all categories
-            analyzeSeasonality(data) {
+            // Analyze all categories with multi-year support
+            analyzeSeasonality(data, options = {}) {
+                const {
+                    multiYear = true,
+                    useCalendarYear = false,
+                    selectedYear = 'all'  // 'all' or specific year like 2024, 2025
+                } = options;
+
                 const results = {};
                 const categories = [...new Set(data.map(row => row.category))];
 
                 categories.forEach(category => {
-                    const seasonalData = this.calculateSeasonalIndices(data, category);
+                    let seasonalData;
+
+                    if (multiYear) {
+                        seasonalData = this.calculateSeasonalIndicesMultiYear(data, category, useCalendarYear);
+                    } else {
+                        // Legacy single-year view (keeps backward compatibility)
+                        seasonalData = this.calculateSeasonalIndices(data, category);
+                    }
+
                     if (seasonalData) {
+                        // Filter to specific year if requested
+                        if (selectedYear !== 'all' && seasonalData.multiYear) {
+                            seasonalData.displayYear = selectedYear;
+                            seasonalData.seasonalIndices = seasonalData.yearlyResults[selectedYear]?.seasonalIndices || seasonalData.seasonalIndices;
+                        }
+
                         results[category] = seasonalData;
                     }
                 });
@@ -7691,7 +8132,9 @@
                 return {
                     categoryResults: results,
                     opportunities: opportunities,
-                    summary: this.generateSummary(results, opportunities)
+                    summary: this.generateSummary(results, opportunities),
+                    availableYears: this.availableYears,
+                    multiYearEnabled: multiYear
                 };
             }
 
@@ -12264,6 +12707,7 @@
             updatePredictiveAnalytics(); // Add predictive analytics
             updateMaverickSpendAnalysis(); // Add maverick spend analysis
             updateContractOptimizationAnalysis(); // Add contract optimization analysis
+            initializeYoYSelectors(); // Initialize Year-over-Year comparison
         }
 
         function updateStats() {
@@ -13359,24 +13803,114 @@
         }
 
         // Seasonality Analysis Functions
+        // Multi-year view mode variables
+        let currentSeasonalityView = 'all';
+        let useFiscalYearMode = true;
+
+        // Set seasonality view mode
+        function setSeasonalityView(viewMode) {
+            currentSeasonalityView = viewMode;
+
+            // Update button states
+            document.querySelectorAll('.year-selector-container .btn').forEach(btn => {
+                btn.classList.remove('btn-primary');
+                btn.classList.add('btn-outline-primary');
+            });
+
+            const activeButton = document.getElementById(`view${viewMode === 'all' ? 'AllYears' : 'FY' + viewMode}`);
+            if (activeButton) {
+                activeButton.classList.remove('btn-outline-primary');
+                activeButton.classList.add('btn-primary');
+            }
+
+            // Re-analyze data with selected view
+            updateSeasonalityAnalysis();
+        }
+
+        // Toggle fiscal year mode
+        function toggleFiscalYear(enabled) {
+            useFiscalYearMode = enabled;
+
+            // Reinitialize seasonality analyzer with appropriate settings
+            if (enabled) {
+                seasonalityAnalyzer = new SeasonalityAnalyzer(7);  // July start
+            } else {
+                seasonalityAnalyzer = new SeasonalityAnalyzer(1);  // January start (calendar year)
+            }
+
+            // Re-analyze data
+            updateSeasonalityAnalysis();
+        }
+
+        // Display year-over-year statistics
+        function displayYearStatistics() {
+            const statsDisplay = safeGetElement('yearStatsDisplay');
+            if (!statsDisplay) return;
+
+            const availableYears = seasonalityAnalytics.availableYears || [];
+
+            if (availableYears.length < 2) {
+                statsDisplay.innerHTML = `<em>Showing data for ${availableYears.length} fiscal year${availableYears.length !== 1 ? 's' : ''}</em>`;
+                return;
+            }
+
+            let totalGrowth = 0;
+            let growthCount = 0;
+
+            // Calculate aggregate growth across all categories
+            Object.values(seasonalityAnalytics.categoryResults).forEach(result => {
+                if (result.yoyGrowth) {
+                    result.yoyGrowth.forEach(yoy => {
+                        totalGrowth += yoy.growthRate;
+                        growthCount++;
+                    });
+                }
+            });
+
+            const avgGrowth = growthCount > 0 ? totalGrowth / growthCount : 0;
+            const growthIcon = avgGrowth > 0 ? '📈' : avgGrowth < 0 ? '📉' : '➡️';
+            const growthColor = avgGrowth > 0 ? '#28a745' : avgGrowth < 0 ? '#dc3545' : '#6c757d';
+
+            statsDisplay.innerHTML = `
+                <strong>Years Available:</strong> FY${availableYears.join(', FY')}
+                <span style="margin-left: 20px;">|</span>
+                <strong style="margin-left: 10px;">Avg YoY Growth:</strong>
+                <span style="color: ${growthColor}; font-weight: bold;">
+                    ${growthIcon} ${avgGrowth.toFixed(1)}%
+                </span>
+            `;
+        }
+
+        // Updated: Seasonality analysis with multi-year support
         function updateSeasonalityAnalysis() {
             if (filteredData.length === 0) {
                 showSeasonalityMessage();
                 return;
             }
 
-            // Perform seasonality analysis
-            seasonalityAnalytics = seasonalityAnalyzer.analyzeSeasonality(filteredData);
+            // Perform seasonality analysis with options
+            seasonalityAnalytics = seasonalityAnalyzer.analyzeSeasonality(filteredData, {
+                multiYear: currentSeasonalityView === 'all' || currentSeasonalityView === 'comparison',
+                useCalendarYear: !useFiscalYearMode,
+                selectedYear: currentSeasonalityView === 'all' ? 'all' : currentSeasonalityView
+            });
 
             if (seasonalityAnalytics.opportunities.length > 0) {
                 displaySeasonalityResults();
+                displayYearStatistics();
+
+                // Show year selector if multi-year data available
+                const yearSelector = safeGetElement('yearSelectorContainer');
+                if (yearSelector && seasonalityAnalytics.availableYears && seasonalityAnalytics.availableYears.length > 1) {
+                    yearSelector.style.display = 'block';
+                }
             } else {
                 showSeasonalityMessage();
             }
         }
 
         function showSeasonalityMessage() {
-            const elements = ['seasonalityIntelligence', 'seasonalityCharts', 'opportunityCards'];
+            const elements = ['seasonalityIntelligence', 'seasonalityCharts', 'opportunityCards', 'yearSelectorContainer'];
             elements.forEach(id => {
                 const element = safeGetElement(id);
                 if (element) element.style.display = 'none';
@@ -13437,7 +13971,7 @@
             `;
         }
 
-        function displaySeasonalityChart() {
+        function displaySeasonalityChart(viewMode = 'all') {
             const chartContainer = safeGetElement('seasonalityCharts');
             const canvas = safeGetElement('seasonalityChart');
 
@@ -13448,47 +13982,159 @@
             const ctx = canvas.getContext('2d');
             if (charts.seasonality) charts.seasonality.destroy();
 
-            // Prepare data for the chart
-            const categories = Object.keys(seasonalityAnalytics.categoryResults);
-            const monthlyData = {};
+            // Get fiscal years from seasonality analytics
+            const availableYears = seasonalityAnalytics.availableYears || [];
+            const multiYearEnabled = seasonalityAnalytics.multiYearEnabled || false;
 
-            // Initialize monthly data
-            for (let month = 1; month <= 12; month++) {
-                monthlyData[month] = 0;
+            let datasets = [];
+
+            if (multiYearEnabled && availableYears.length > 1) {
+                // MULTI-YEAR VIEW: Show each year as separate line
+                const colors = [
+                    { border: '#17a2b8', bg: 'rgba(23, 162, 184, 0.1)' },   // Teal
+                    { border: '#28a745', bg: 'rgba(40, 167, 69, 0.1)' },    // Green
+                    { border: '#ffc107', bg: 'rgba(255, 193, 7, 0.1)' },    // Yellow
+                    { border: '#dc3545', bg: 'rgba(220, 53, 69, 0.1)' },    // Red
+                    { border: '#6f42c1', bg: 'rgba(111, 66, 193, 0.1)' }    // Purple
+                ];
+
+                availableYears.forEach((year, index) => {
+                    const colorIndex = index % colors.length;
+                    const yearData = [];
+
+                    // Aggregate all categories for this year
+                    const monthlyData = {};
+                    for (let month = 1; month <= 12; month++) {
+                        monthlyData[month] = 0;
+                    }
+
+                    Object.values(seasonalityAnalytics.categoryResults).forEach(result => {
+                        if (result.multiYear && result.yearlyResults[year]) {
+                            const yearResult = result.yearlyResults[year];
+                            for (let month = 1; month <= 12; month++) {
+                                monthlyData[month] += yearResult.seasonalIndices[month].spend;
+                            }
+                        }
+                    });
+
+                    // Convert to array
+                    for (let month = 1; month <= 12; month++) {
+                        yearData.push(monthlyData[month]);
+                    }
+
+                    datasets.push({
+                        label: `FY${year}`,
+                        data: yearData,
+                        borderColor: colors[colorIndex].border,
+                        backgroundColor: colors[colorIndex].bg,
+                        borderWidth: 3,
+                        fill: false,
+                        tension: 0.4
+                    });
+                });
+
+                // Add average line if more than 2 years
+                if (availableYears.length >= 2) {
+                    const avgData = [];
+                    for (let month = 1; month <= 12; month++) {
+                        let total = 0;
+                        let count = 0;
+
+                        datasets.forEach(ds => {
+                            if (ds.data[month - 1] !== undefined) {
+                                total += ds.data[month - 1];
+                                count++;
+                            }
+                        });
+
+                        avgData.push(count > 0 ? total / count : 0);
+                    }
+
+                    datasets.push({
+                        label: 'Average',
+                        data: avgData,
+                        borderColor: '#6c757d',
+                        backgroundColor: 'rgba(108, 117, 125, 0.1)',
+                        borderWidth: 3,
+                        borderDash: [5, 5],
+                        fill: false,
+                        tension: 0.4
+                    });
+                }
+
+            } else {
+                // SINGLE-YEAR VIEW (legacy or when only one year available)
+                const monthlyData = {};
+                for (let month = 1; month <= 12; month++) {
+                    monthlyData[month] = 0;
+                }
+
+                filteredData.forEach(row => {
+                    const fiscalMonth = seasonalityAnalyzer.calendarToFiscalMonth(new Date(row.date).getMonth() + 1);
+                    if (fiscalMonth >= 1 && fiscalMonth <= 12) {
+                        monthlyData[fiscalMonth] += row.amount;
+                    }
+                });
+
+                const data = [];
+                for (let month = 1; month <= 12; month++) {
+                    data.push(monthlyData[month]);
+                }
+
+                datasets = [{
+                    label: 'Monthly Spend',
+                    data: data,
+                    borderColor: '#17a2b8',
+                    backgroundColor: 'rgba(23, 162, 184, 0.1)',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4
+                }];
             }
 
-            // Aggregate monthly spend across all categories
-            filteredData.forEach(row => {
-                const month = new Date(row.date).getMonth() + 1;
-                // Ensure month is valid (1-12) before accessing monthlyData
-                if (month >= 1 && month <= 12) {
-                    monthlyData[month] += row.amount;
-                }
-            });
-
-            const labels = seasonalityAnalyzer.monthNames;
-            const data = labels.map((_, index) => monthlyData[index + 1]);
+            // Use fiscal month names
+            const labels = seasonalityAnalyzer.fiscalMonthNames;
 
             charts.seasonality = new Chart(ctx, {
                 type: 'line',
                 data: {
                     labels: labels,
-                    datasets: [{
-                        label: 'Monthly Spend',
-                        data: data,
-                        borderColor: '#17a2b8',
-                        backgroundColor: 'rgba(23, 162, 184, 0.1)',
-                        borderWidth: 3,
-                        fill: true,
-                        tension: 0.4
-                    }]
+                    datasets: datasets
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: {
                         legend: {
-                            display: false
+                            display: datasets.length > 1,
+                            position: 'top',
+                            labels: {
+                                usePointStyle: true,
+                                padding: 15,
+                                font: {
+                                    size: 12,
+                                    weight: 'bold'
+                                }
+                            }
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false,
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': ' + formatCurrency(context.parsed.y);
+                                }
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: multiYearEnabled && availableYears.length > 1
+                                ? 'Multi-Year Seasonality Analysis (Fiscal Year)'
+                                : 'Seasonality Analysis (Fiscal Year)',
+                            font: {
+                                size: 16,
+                                weight: 'bold'
+                            }
                         }
                     },
                     scales: {
@@ -13498,8 +14144,31 @@
                                 callback: function (value) {
                                     return '$' + value.toLocaleString();
                                 }
+                            },
+                            title: {
+                                display: true,
+                                text: 'Spend Amount',
+                                font: {
+                                    size: 12,
+                                    weight: 'bold'
+                                }
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Fiscal Year Month',
+                                font: {
+                                    size: 12,
+                                    weight: 'bold'
+                                }
                             }
                         }
+                    },
+                    interaction: {
+                        mode: 'nearest',
+                        axis: 'x',
+                        intersect: false
                     }
                 }
             });
@@ -13513,34 +14182,60 @@
 
             const opportunities = seasonalityAnalytics.opportunities.slice(0, 6); // Show top 6
 
-            container.innerHTML = opportunities.map(opp => `
-                <div class="opportunity-card">
-                    <div class="opportunity-title">
-                        ${opp.category} - ${opp.type}
-                    </div>
-                    <div class="opportunity-description">
-                        Peak spending in ${opp.peakMonthName}, low in ${opp.lowMonthName}. 
-                        Seasonality strength: ${opp.seasonalityStrength.toFixed(1)}%
-                    </div>
-                    <div class="opportunity-metrics">
-                        <div class="opportunity-metric">
-                            <div class="opportunity-metric-value">${formatCurrency(opp.optimisticSavings)}</div>
-                            <div class="opportunity-metric-label">Savings Potential</div>
+            container.innerHTML = opportunities.map(opp => {
+                // Get category result for YoY data
+                const categoryResult = seasonalityAnalytics.categoryResults[opp.category];
+                const yoyData = categoryResult?.yoyGrowth;
+
+                let yoyHTML = '';
+                if (yoyData && yoyData.length > 0) {
+                    const latestYoY = yoyData[yoyData.length - 1];
+                    const growthIcon = latestYoY.growthRate > 0 ? '↗️' : latestYoY.growthRate < 0 ? '↘️' : '➡️';
+                    const growthColor = latestYoY.growthRate > 0 ? '#28a745' : latestYoY.growthRate < 0 ? '#dc3545' : '#6c757d';
+
+                    yoyHTML = `
+                        <div class="opportunity-yoy" style="margin-top: 10px; padding: 8px; background: #f8f9fa; border-radius: 4px;">
+                            <small style="color: #6c757d;">YoY Growth (FY${latestYoY.fromYear} → FY${latestYoY.toYear}):</small>
+                            <strong style="color: ${growthColor}; font-size: 1.1rem;">
+                                ${growthIcon} ${latestYoY.growthRate.toFixed(1)}%
+                            </strong>
+                            <small style="display: block; color: #6c757d; margin-top: 4px;">
+                                ${formatCurrency(latestYoY.previousSpend)} → ${formatCurrency(latestYoY.currentSpend)}
+                            </small>
                         </div>
-                        <div class="opportunity-metric">
-                            <div class="opportunity-metric-value">${opp.impact}</div>
-                            <div class="opportunity-metric-label">Impact Level</div>
+                    `;
+                }
+
+                return `
+                    <div class="opportunity-card">
+                        <div class="opportunity-title">
+                            ${opp.category} - ${opp.type}
                         </div>
-                        <div class="opportunity-metric">
-                            <div class="opportunity-metric-value">${opp.timeline}</div>
-                            <div class="opportunity-metric-label">Timeline</div>
+                        <div class="opportunity-description">
+                            Peak spending in ${opp.peakMonthName}, low in ${opp.lowMonthName}.
+                            Seasonality strength: ${opp.seasonalityStrength.toFixed(1)}%
+                        </div>
+                        ${yoyHTML}
+                        <div class="opportunity-metrics">
+                            <div class="opportunity-metric">
+                                <div class="opportunity-metric-value">${formatCurrency(opp.optimisticSavings)}</div>
+                                <div class="opportunity-metric-label">Savings Potential</div>
+                            </div>
+                            <div class="opportunity-metric">
+                                <div class="opportunity-metric-value">${opp.impact}</div>
+                                <div class="opportunity-metric-label">Impact Level</div>
+                            </div>
+                            <div class="opportunity-metric">
+                                <div class="opportunity-metric-value">${opp.timeline}</div>
+                                <div class="opportunity-metric-label">Timeline</div>
+                            </div>
+                        </div>
+                        <div class="opportunity-recommendation">
+                            💡 Contract during ${opp.lowMonthName} (low demand) for ${opp.peakMonthName} (peak demand) services to optimize costs.
                         </div>
                     </div>
-                    <div class="opportunity-recommendation">
-                        💡 Contract during ${opp.lowMonthName} (low demand) for ${opp.peakMonthName} (peak demand) services to optimize costs.
-                    </div>
-                </div>
-            `).join('');
+                `;
+            }).join('');
         }
 
         // Tail Spend Analysis Functions
@@ -15536,6 +16231,798 @@
                 </div>
             `;
         }
+
+        // ============================================================================
+        // Year-over-Year Comparison Functions
+        // ============================================================================
+
+        // Apply year-over-year comparison
+        function applyYoYComparison() {
+            const year1 = parseInt(document.getElementById('yoyYear1').value);
+            const year2 = parseInt(document.getElementById('yoyYear2').value);
+
+            if (year1 === year2) {
+                alert('Please select two different fiscal years for comparison.');
+                return;
+            }
+
+            if (!seasonalityAnalytics || !seasonalityAnalytics.yearlyResults) {
+                alert('Please load data first.');
+                return;
+            }
+
+            // Check if selected years have data
+            if (!seasonalityAnalytics.yearlyResults[year1] || !seasonalityAnalytics.yearlyResults[year2]) {
+                alert('One or both selected fiscal years do not have data available.');
+                return;
+            }
+
+            // Calculate and display YoY comparison
+            calculateAndDisplayYoYComparison(year1, year2);
+        }
+
+        // Swap selected years
+        function swapYoYYears() {
+            const year1Select = document.getElementById('yoyYear1');
+            const year2Select = document.getElementById('yoyYear2');
+
+            const temp = year1Select.value;
+            year1Select.value = year2Select.value;
+            year2Select.value = temp;
+
+            // Auto-apply after swapping
+            applyYoYComparison();
+        }
+
+        // Calculate and display year-over-year comparison
+        function calculateAndDisplayYoYComparison(year1, year2) {
+            try {
+                // Get data for both years
+                const year1Data = filteredData.filter(row => seasonalityAnalyzer.getFiscalYear(row['Creation Date']) === year1);
+                const year2Data = filteredData.filter(row => seasonalityAnalyzer.getFiscalYear(row['Creation Date']) === year2);
+
+                // Calculate metrics for both years
+                const year1Metrics = calculateYearMetrics(year1Data);
+                const year2Metrics = calculateYearMetrics(year2Data);
+
+                // Calculate YoY changes
+                const yoyMetrics = {
+                    year1: year1,
+                    year2: year2,
+                    year1Metrics: year1Metrics,
+                    year2Metrics: year2Metrics,
+                    totalSpendChange: year2Metrics.totalSpend - year1Metrics.totalSpend,
+                    totalSpendChangePercent: ((year2Metrics.totalSpend - year1Metrics.totalSpend) / year1Metrics.totalSpend) * 100,
+                    transactionCountChange: year2Metrics.transactionCount - year1Metrics.transactionCount,
+                    transactionCountChangePercent: ((year2Metrics.transactionCount - year1Metrics.transactionCount) / year1Metrics.transactionCount) * 100,
+                    avgTransactionChange: year2Metrics.avgTransaction - year1Metrics.avgTransaction,
+                    avgTransactionChangePercent: ((year2Metrics.avgTransaction - year1Metrics.avgTransaction) / year1Metrics.avgTransaction) * 100,
+                    supplierCountChange: year2Metrics.supplierCount - year1Metrics.supplierCount,
+                    supplierCountChangePercent: ((year2Metrics.supplierCount - year1Metrics.supplierCount) / year1Metrics.supplierCount) * 100
+                };
+
+                // Display all YoY components
+                displayYoYMetricsCards(yoyMetrics);
+                displayYoYCategoryComparison(year1Data, year2Data, year1, year2);
+                displayYoYMonthlyComparison(year1Data, year2Data, year1, year2);
+                displayYoYTopMovers(year1Data, year2Data);
+                displayYoYSupplierComparison(year1Data, year2Data);
+
+            } catch (error) {
+                console.error('Error calculating YoY comparison:', error);
+                alert('An error occurred while calculating the comparison. Please try again.');
+            }
+        }
+
+        // Calculate metrics for a year
+        function calculateYearMetrics(data) {
+            const totalSpend = data.reduce((sum, row) => sum + parseFloat(row[' Amount '] || 0), 0);
+            const transactionCount = data.length;
+            const suppliers = [...new Set(data.map(row => row['Supplier']))];
+            const supplierCount = suppliers.length;
+            const avgTransaction = totalSpend / transactionCount;
+
+            return {
+                totalSpend: totalSpend,
+                transactionCount: transactionCount,
+                supplierCount: supplierCount,
+                avgTransaction: avgTransaction
+            };
+        }
+
+        // Display YoY metrics cards
+        function displayYoYMetricsCards(yoyMetrics) {
+            const container = safeGetElement('yoyMetricsCards');
+            if (!container) return;
+
+            const metrics = [
+                {
+                    title: 'Total Spend',
+                    year1Value: yoyMetrics.year1Metrics.totalSpend,
+                    year2Value: yoyMetrics.year2Metrics.totalSpend,
+                    change: yoyMetrics.totalSpendChange,
+                    changePercent: yoyMetrics.totalSpendChangePercent,
+                    format: 'currency',
+                    icon: '💰'
+                },
+                {
+                    title: 'Transaction Count',
+                    year1Value: yoyMetrics.year1Metrics.transactionCount,
+                    year2Value: yoyMetrics.year2Metrics.transactionCount,
+                    change: yoyMetrics.transactionCountChange,
+                    changePercent: yoyMetrics.transactionCountChangePercent,
+                    format: 'number',
+                    icon: '📊'
+                },
+                {
+                    title: 'Average Transaction',
+                    year1Value: yoyMetrics.year1Metrics.avgTransaction,
+                    year2Value: yoyMetrics.year2Metrics.avgTransaction,
+                    change: yoyMetrics.avgTransactionChange,
+                    changePercent: yoyMetrics.avgTransactionChangePercent,
+                    format: 'currency',
+                    icon: '📈'
+                },
+                {
+                    title: 'Supplier Count',
+                    year1Value: yoyMetrics.year1Metrics.supplierCount,
+                    year2Value: yoyMetrics.year2Metrics.supplierCount,
+                    change: yoyMetrics.supplierCountChange,
+                    changePercent: yoyMetrics.supplierCountChangePercent,
+                    format: 'number',
+                    icon: '🏢'
+                }
+            ];
+
+            container.innerHTML = metrics.map(metric => {
+                const isPositive = metric.change > 0;
+                const isNeutral = metric.change === 0;
+                const changeColor = isNeutral ? '#6c757d' : (isPositive ? '#28a745' : '#dc3545');
+                const changeIcon = isNeutral ? '➡️' : (isPositive ? '↗️' : '↘️');
+
+                const formatValue = (value) => {
+                    if (metric.format === 'currency') {
+                        return formatCurrency(value);
+                    } else {
+                        return value.toLocaleString();
+                    }
+                };
+
+                return `
+                    <div class="yoy-metric-card" style="background: white; border-radius: 8px; padding: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px;">
+                            <span style="font-size: 2rem;">${metric.icon}</span>
+                            <h4 style="margin: 0; color: #2c3e50; font-size: 1rem;">${metric.title}</h4>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                            <div>
+                                <div style="font-size: 0.8rem; color: #6c757d; margin-bottom: 5px;">FY${yoyMetrics.year1}</div>
+                                <div style="font-size: 1.3rem; font-weight: bold; color: #495057;">${formatValue(metric.year1Value)}</div>
+                            </div>
+                            <div style="font-size: 1.5rem; color: #dee2e6;">→</div>
+                            <div>
+                                <div style="font-size: 0.8rem; color: #6c757d; margin-bottom: 5px;">FY${yoyMetrics.year2}</div>
+                                <div style="font-size: 1.3rem; font-weight: bold; color: #495057;">${formatValue(metric.year2Value)}</div>
+                            </div>
+                        </div>
+                        <div style="padding-top: 15px; border-top: 1px solid #e9ecef;">
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <span style="font-size: 1.2rem;">${changeIcon}</span>
+                                <span style="font-size: 1.1rem; font-weight: bold; color: ${changeColor};">
+                                    ${isPositive ? '+' : ''}${metric.changePercent.toFixed(1)}%
+                                </span>
+                            </div>
+                            <div style="font-size: 0.85rem; color: #6c757d; margin-top: 5px;">
+                                ${isPositive ? '+' : ''}${formatValue(metric.change)} change
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Display YoY category comparison
+        function displayYoYCategoryComparison(year1Data, year2Data, year1, year2) {
+            // Calculate category spend for both years
+            const year1Categories = {};
+            const year2Categories = {};
+
+            year1Data.forEach(row => {
+                const category = row['Category'] || 'Unknown';
+                const amount = parseFloat(row[' Amount '] || 0);
+                year1Categories[category] = (year1Categories[category] || 0) + amount;
+            });
+
+            year2Data.forEach(row => {
+                const category = row['Category'] || 'Unknown';
+                const amount = parseFloat(row[' Amount '] || 0);
+                year2Categories[category] = (year2Categories[category] || 0) + amount;
+            });
+
+            // Get all categories
+            const allCategories = [...new Set([...Object.keys(year1Categories), ...Object.keys(year2Categories)])];
+
+            // Calculate growth for bar chart
+            const categoryGrowth = allCategories.map(category => {
+                const year1Spend = year1Categories[category] || 0;
+                const year2Spend = year2Categories[category] || 0;
+                const growth = year1Spend > 0 ? ((year2Spend - year1Spend) / year1Spend) * 100 : 0;
+                return {
+                    category: category,
+                    growth: growth,
+                    year1Spend: year1Spend,
+                    year2Spend: year2Spend
+                };
+            }).sort((a, b) => Math.abs(b.growth) - Math.abs(a.growth));
+
+            // Create pie charts for distribution
+            createYoYPieCharts(year1Categories, year2Categories, year1, year2);
+
+            // Create bar chart for category growth
+            createYoYCategoryGrowthChart(categoryGrowth);
+        }
+
+        // Create pie charts for YoY distribution
+        function createYoYPieCharts(year1Categories, year2Categories, year1, year2) {
+            // Year 1 pie chart
+            const ctx1 = safeGetElement('yoyPieChart1')?.getContext('2d');
+            if (!ctx1) return;
+
+            const year1Sorted = Object.entries(year1Categories)
+                .sort(([, a], [, b]) => b - a)
+                .slice(0, 8);
+
+            if (charts.yoyPie1) charts.yoyPie1.destroy();
+
+            const colors1 = generateColors(year1Sorted.length);
+
+            charts.yoyPie1 = new Chart(ctx1, {
+                type: 'doughnut',
+                data: {
+                    labels: year1Sorted.map(([cat]) => cat),
+                    datasets: [{
+                        data: year1Sorted.map(([, spend]) => spend),
+                        backgroundColor: colors1,
+                        borderWidth: 2,
+                        borderColor: '#fff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                boxWidth: 15,
+                                padding: 10,
+                                font: { size: 11 }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = ((context.parsed / total) * 100).toFixed(1);
+                                    return `${context.label}: ${formatCurrency(context.parsed)} (${percentage}%)`;
+                                }
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: `FY${year1} Distribution`,
+                            font: { size: 14, weight: 'bold' }
+                        }
+                    }
+                }
+            });
+
+            // Year 2 pie chart
+            const ctx2 = safeGetElement('yoyPieChart2')?.getContext('2d');
+            if (!ctx2) return;
+
+            const year2Sorted = Object.entries(year2Categories)
+                .sort(([, a], [, b]) => b - a)
+                .slice(0, 8);
+
+            if (charts.yoyPie2) charts.yoyPie2.destroy();
+
+            const colors2 = generateColors(year2Sorted.length);
+
+            charts.yoyPie2 = new Chart(ctx2, {
+                type: 'doughnut',
+                data: {
+                    labels: year2Sorted.map(([cat]) => cat),
+                    datasets: [{
+                        data: year2Sorted.map(([, spend]) => spend),
+                        backgroundColor: colors2,
+                        borderWidth: 2,
+                        borderColor: '#fff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                boxWidth: 15,
+                                padding: 10,
+                                font: { size: 11 }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = ((context.parsed / total) * 100).toFixed(1);
+                                    return `${context.label}: ${formatCurrency(context.parsed)} (${percentage}%)`;
+                                }
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: `FY${year2} Distribution`,
+                            font: { size: 14, weight: 'bold' }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Create category growth bar chart
+        function createYoYCategoryGrowthChart(categoryGrowth) {
+            const ctx = safeGetElement('yoyCategoryGrowthChart')?.getContext('2d');
+            if (!ctx) return;
+
+            if (charts.yoyCategoryGrowth) charts.yoyCategoryGrowth.destroy();
+
+            const top10 = categoryGrowth.slice(0, 10);
+
+            const colors = top10.map(item => item.growth > 0 ? '#28a745' : item.growth < 0 ? '#dc3545' : '#6c757d');
+
+            charts.yoyCategoryGrowth = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: top10.map(item => item.category),
+                    datasets: [{
+                        label: 'YoY Growth %',
+                        data: top10.map(item => item.growth),
+                        backgroundColor: colors,
+                        borderColor: colors,
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const item = top10[context.dataIndex];
+                                    return [
+                                        `Growth: ${context.parsed.x.toFixed(1)}%`,
+                                        `FY${item.year1Spend ? 'Previous' : ''}: ${formatCurrency(item.year1Spend)}`,
+                                        `FY${item.year2Spend ? 'Current' : ''}: ${formatCurrency(item.year2Spend)}`
+                                    ];
+                                }
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: 'Top 10 Category Growth Rates',
+                            font: { size: 14, weight: 'bold' }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'YoY Growth %'
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    return value.toFixed(0) + '%';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Display YoY monthly comparison
+        function displayYoYMonthlyComparison(year1Data, year2Data, year1, year2) {
+            // Calculate monthly spend for both years
+            const year1Monthly = {};
+            const year2Monthly = {};
+
+            // Initialize all 12 fiscal months
+            for (let i = 1; i <= 12; i++) {
+                year1Monthly[i] = 0;
+                year2Monthly[i] = 0;
+            }
+
+            year1Data.forEach(row => {
+                const date = new Date(row['Creation Date']);
+                const fiscalMonth = seasonalityAnalyzer.calendarToFiscalMonth(date.getMonth() + 1);
+                const amount = parseFloat(row[' Amount '] || 0);
+                year1Monthly[fiscalMonth] += amount;
+            });
+
+            year2Data.forEach(row => {
+                const date = new Date(row['Creation Date']);
+                const fiscalMonth = seasonalityAnalyzer.calendarToFiscalMonth(date.getMonth() + 1);
+                const amount = parseFloat(row[' Amount '] || 0);
+                year2Monthly[fiscalMonth] += amount;
+            });
+
+            // Create spending comparison chart
+            const ctx1 = safeGetElement('yoyMonthlySpendChart')?.getContext('2d');
+            if (ctx1) {
+                if (charts.yoyMonthlySpend) charts.yoyMonthlySpend.destroy();
+
+                const fiscalMonthNames = seasonalityAnalyzer.fiscalMonthNames;
+
+                charts.yoyMonthlySpend = new Chart(ctx1, {
+                    type: 'line',
+                    data: {
+                        labels: fiscalMonthNames,
+                        datasets: [
+                            {
+                                label: `FY${year1}`,
+                                data: Object.values(year1Monthly),
+                                borderColor: '#17a2b8',
+                                backgroundColor: 'rgba(23, 162, 184, 0.1)',
+                                borderWidth: 3,
+                                tension: 0.4,
+                                fill: true
+                            },
+                            {
+                                label: `FY${year2}`,
+                                data: Object.values(year2Monthly),
+                                borderColor: '#28a745',
+                                backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                                borderWidth: 3,
+                                tension: 0.4,
+                                fill: true
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: true,
+                                position: 'top'
+                            },
+                            tooltip: {
+                                mode: 'index',
+                                intersect: false,
+                                callbacks: {
+                                    label: function(context) {
+                                        return `${context.dataset.label}: ${formatCurrency(context.parsed.y)}`;
+                                    }
+                                }
+                            },
+                            title: {
+                                display: true,
+                                text: 'Monthly Spending Comparison',
+                                font: { size: 14, weight: 'bold' }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: function(value) {
+                                        return formatCurrency(value);
+                                    }
+                                },
+                                title: {
+                                    display: true,
+                                    text: 'Spend Amount'
+                                }
+                            },
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Fiscal Year Month'
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Create growth rate chart
+            const ctx2 = safeGetElement('yoyMonthlyGrowthChart')?.getContext('2d');
+            if (ctx2) {
+                if (charts.yoyMonthlyGrowth) charts.yoyMonthlyGrowth.destroy();
+
+                const fiscalMonthNames = seasonalityAnalyzer.fiscalMonthNames;
+                const monthlyGrowth = [];
+
+                for (let i = 1; i <= 12; i++) {
+                    const year1Amount = year1Monthly[i] || 0;
+                    const year2Amount = year2Monthly[i] || 0;
+                    const growth = year1Amount > 0 ? ((year2Amount - year1Amount) / year1Amount) * 100 : 0;
+                    monthlyGrowth.push(growth);
+                }
+
+                const colors = monthlyGrowth.map(g => g > 0 ? '#28a745' : g < 0 ? '#dc3545' : '#6c757d');
+
+                charts.yoyMonthlyGrowth = new Chart(ctx2, {
+                    type: 'bar',
+                    data: {
+                        labels: fiscalMonthNames,
+                        datasets: [{
+                            label: 'Monthly Growth %',
+                            data: monthlyGrowth,
+                            backgroundColor: colors,
+                            borderColor: colors,
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return `Growth: ${context.parsed.y.toFixed(1)}%`;
+                                    }
+                                }
+                            },
+                            title: {
+                                display: true,
+                                text: 'Month-over-Month Growth Rate',
+                                font: { size: 14, weight: 'bold' }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                title: {
+                                    display: true,
+                                    text: 'Growth %'
+                                },
+                                ticks: {
+                                    callback: function(value) {
+                                        return value.toFixed(0) + '%';
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        // Display YoY top movers
+        function displayYoYTopMovers(year1Data, year2Data) {
+            // Calculate category changes
+            const year1Categories = {};
+            const year2Categories = {};
+
+            year1Data.forEach(row => {
+                const category = row['Category'] || 'Unknown';
+                const amount = parseFloat(row[' Amount '] || 0);
+                year1Categories[category] = (year1Categories[category] || 0) + amount;
+            });
+
+            year2Data.forEach(row => {
+                const category = row['Category'] || 'Unknown';
+                const amount = parseFloat(row[' Amount '] || 0);
+                year2Categories[category] = (year2Categories[category] || 0) + amount;
+            });
+
+            const allCategories = [...new Set([...Object.keys(year1Categories), ...Object.keys(year2Categories)])];
+
+            const movers = allCategories.map(category => {
+                const year1Spend = year1Categories[category] || 0;
+                const year2Spend = year2Categories[category] || 0;
+                const change = year2Spend - year1Spend;
+                const changePercent = year1Spend > 0 ? ((year2Spend - year1Spend) / year1Spend) * 100 : 0;
+
+                return {
+                    category: category,
+                    year1Spend: year1Spend,
+                    year2Spend: year2Spend,
+                    change: change,
+                    changePercent: changePercent
+                };
+            }).filter(item => item.year1Spend > 0); // Only categories with previous year data
+
+            // Sort by absolute change
+            const sortedByChange = [...movers].sort((a, b) => Math.abs(b.change) - Math.abs(a.change));
+
+            // Top gainers
+            const gainers = sortedByChange.filter(item => item.change > 0).slice(0, 5);
+
+            // Top decliners
+            const decliners = sortedByChange.filter(item => item.change < 0).slice(0, 5);
+
+            // Display gainers
+            const gainersContainer = safeGetElement('yoyTopGainers');
+            if (gainersContainer) {
+                if (gainers.length === 0) {
+                    gainersContainer.innerHTML = '<div class="no-data-message" style="padding: 20px; text-align: center; color: #6c757d;">No categories with increased spending</div>';
+                } else {
+                    gainersContainer.innerHTML = gainers.map((item, index) => `
+                        <div class="yoy-mover-item" style="padding: 15px; background: ${index % 2 === 0 ? '#f8f9fa' : 'white'}; border-left: 4px solid #28a745; margin-bottom: 10px; border-radius: 4px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                <strong style="color: #2c3e50; font-size: 1.05rem;">${item.category}</strong>
+                                <span style="color: #28a745; font-weight: bold; font-size: 1.1rem;">
+                                    ↗️ +${item.changePercent.toFixed(1)}%
+                                </span>
+                            </div>
+                            <div style="font-size: 0.9rem; color: #6c757d;">
+                                ${formatCurrency(item.year1Spend)} → ${formatCurrency(item.year2Spend)}
+                            </div>
+                            <div style="font-size: 0.85rem; color: #28a745; margin-top: 5px;">
+                                Increase: ${formatCurrency(item.change)}
+                            </div>
+                        </div>
+                    `).join('');
+                }
+            }
+
+            // Display decliners
+            const declinersContainer = safeGetElement('yoyTopDecliners');
+            if (declinersContainer) {
+                if (decliners.length === 0) {
+                    declinersContainer.innerHTML = '<div class="no-data-message" style="padding: 20px; text-align: center; color: #6c757d;">No categories with decreased spending</div>';
+                } else {
+                    declinersContainer.innerHTML = decliners.map((item, index) => `
+                        <div class="yoy-mover-item" style="padding: 15px; background: ${index % 2 === 0 ? '#f8f9fa' : 'white'}; border-left: 4px solid #dc3545; margin-bottom: 10px; border-radius: 4px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                <strong style="color: #2c3e50; font-size: 1.05rem;">${item.category}</strong>
+                                <span style="color: #dc3545; font-weight: bold; font-size: 1.1rem;">
+                                    ↘️ ${item.changePercent.toFixed(1)}%
+                                </span>
+                            </div>
+                            <div style="font-size: 0.9rem; color: #6c757d;">
+                                ${formatCurrency(item.year1Spend)} → ${formatCurrency(item.year2Spend)}
+                            </div>
+                            <div style="font-size: 0.85rem; color: #dc3545; margin-top: 5px;">
+                                Decrease: ${formatCurrency(Math.abs(item.change))}
+                            </div>
+                        </div>
+                    `).join('');
+                }
+            }
+        }
+
+        // Display YoY supplier comparison
+        function displayYoYSupplierComparison(year1Data, year2Data) {
+            // Calculate supplier spend for both years
+            const year1Suppliers = {};
+            const year2Suppliers = {};
+
+            year1Data.forEach(row => {
+                const supplier = row['Supplier'] || 'Unknown';
+                const amount = parseFloat(row[' Amount '] || 0);
+                year1Suppliers[supplier] = (year1Suppliers[supplier] || 0) + amount;
+            });
+
+            year2Data.forEach(row => {
+                const supplier = row['Supplier'] || 'Unknown';
+                const amount = parseFloat(row[' Amount '] || 0);
+                year2Suppliers[supplier] = (year2Suppliers[supplier] || 0) + amount;
+            });
+
+            const allSuppliers = [...new Set([...Object.keys(year1Suppliers), ...Object.keys(year2Suppliers)])];
+
+            const supplierComparison = allSuppliers.map(supplier => {
+                const year1Spend = year1Suppliers[supplier] || 0;
+                const year2Spend = year2Suppliers[supplier] || 0;
+                const change = year2Spend - year1Spend;
+                const changePercent = year1Spend > 0 ? ((year2Spend - year1Spend) / year1Spend) * 100 : (year2Spend > 0 ? 100 : 0);
+
+                return {
+                    supplier: supplier,
+                    year1Spend: year1Spend,
+                    year2Spend: year2Spend,
+                    change: change,
+                    changePercent: changePercent,
+                    totalSpend: year1Spend + year2Spend
+                };
+            }).sort((a, b) => b.totalSpend - a.totalSpend).slice(0, 15);
+
+            // Display supplier comparison table
+            const container = safeGetElement('yoySupplierTable');
+            if (container) {
+                container.innerHTML = `
+                    <table class="yoy-supplier-table" style="width: 100%; border-collapse: collapse;">
+                        <thead>
+                            <tr style="background: #f8f9fa; border-bottom: 2px solid #dee2e6;">
+                                <th style="padding: 12px; text-align: left; font-weight: bold; color: #495057;">Supplier</th>
+                                <th style="padding: 12px; text-align: right; font-weight: bold; color: #495057;">FY Previous</th>
+                                <th style="padding: 12px; text-align: right; font-weight: bold; color: #495057;">FY Current</th>
+                                <th style="padding: 12px; text-align: right; font-weight: bold; color: #495057;">Change</th>
+                                <th style="padding: 12px; text-align: right; font-weight: bold; color: #495057;">Growth %</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${supplierComparison.map((item, index) => {
+                                const changeIcon = item.change > 0 ? '↗️' : item.change < 0 ? '↘️' : '➡️';
+                                const changeColor = item.change > 0 ? '#28a745' : item.change < 0 ? '#dc3545' : '#6c757d';
+
+                                return `
+                                    <tr style="border-bottom: 1px solid #e9ecef; background: ${index % 2 === 0 ? 'white' : '#f8f9fa'};">
+                                        <td style="padding: 12px; font-weight: 500; color: #2c3e50;">${item.supplier}</td>
+                                        <td style="padding: 12px; text-align: right; color: #6c757d;">${formatCurrency(item.year1Spend)}</td>
+                                        <td style="padding: 12px; text-align: right; color: #495057; font-weight: 500;">${formatCurrency(item.year2Spend)}</td>
+                                        <td style="padding: 12px; text-align: right; color: ${changeColor}; font-weight: 500;">
+                                            ${item.change > 0 ? '+' : ''}${formatCurrency(item.change)}
+                                        </td>
+                                        <td style="padding: 12px; text-align: right; color: ${changeColor}; font-weight: bold;">
+                                            ${changeIcon} ${item.change > 0 ? '+' : ''}${item.changePercent.toFixed(1)}%
+                                        </td>
+                                    </tr>
+                                `;
+                            }).join('')}
+                        </tbody>
+                    </table>
+                `;
+            }
+        }
+
+        // Initialize Year-over-Year selectors with available years
+        function initializeYoYSelectors() {
+            if (!seasonalityAnalytics || !seasonalityAnalytics.availableYears || seasonalityAnalytics.availableYears.length === 0) {
+                return;
+            }
+
+            const years = seasonalityAnalytics.availableYears.sort((a, b) => b - a); // Sort descending (newest first)
+
+            const year1Select = safeGetElement('yoyYear1');
+            const year2Select = safeGetElement('yoyYear2');
+
+            if (!year1Select || !year2Select) return;
+
+            // Clear existing options
+            year1Select.innerHTML = '';
+            year2Select.innerHTML = '';
+
+            // Populate both selectors with available years
+            years.forEach(year => {
+                const option1 = document.createElement('option');
+                option1.value = year;
+                option1.textContent = `FY${year}`;
+                year1Select.appendChild(option1);
+
+                const option2 = document.createElement('option');
+                option2.value = year;
+                option2.textContent = `FY${year}`;
+                year2Select.appendChild(option2);
+            });
+
+            // Set default selections (most recent vs previous year)
+            if (years.length >= 2) {
+                year1Select.value = years[0]; // Most recent year
+                year2Select.value = years[1]; // Previous year
+            } else if (years.length === 1) {
+                year1Select.value = years[0];
+                year2Select.value = years[0];
+            }
+
+            // Auto-apply comparison if we have at least 2 years
+            if (years.length >= 2) {
+                applyYoYComparison();
+            }
+        }
+
+        // ============================================================================
+        // End of Year-over-Year Comparison Functions
+        // ============================================================================
 
         // Tab switching function for consolidation opportunities
         function showConsolidationTab(tabName) {
