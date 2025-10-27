@@ -13770,7 +13770,6 @@
 
             // Trigger YoY comparison when YoY tab is clicked
             if (tabName === 'yoycomparison' && seasonalityAnalytics && seasonalityAnalytics.availableYears && seasonalityAnalytics.availableYears.length >= 2) {
-                console.log('YoY tab activated - triggering comparison');
                 setTimeout(() => {
                     applyYoYComparison();
                 }, 100); // Small delay to ensure DOM is ready
@@ -14941,16 +14940,10 @@
         // Predictive Analytics Display Functions
         function updatePredictiveAnalytics() {
             try {
-                console.log('=== PREDICTIVE ANALYTICS DEBUG START ===');
-                console.log('filteredData length:', filteredData ? filteredData.length : 'null/undefined');
-                console.log('filteredData sample:', filteredData ? filteredData.slice(0, 3) : 'no data');
-
-                // Show/hide appropriate containers
                 const predictiveContainer = safeGetElement('predictiveContainer');
                 const noPredictiveMessage = safeGetElement('noPredictiveMessage');
 
                 if (!filteredData || filteredData.length === 0) {
-                    console.log('No filtered data available for predictive analytics');
                     if (predictiveContainer) predictiveContainer.style.display = 'none';
                     if (noPredictiveMessage) noPredictiveMessage.style.display = 'block';
                     return;
@@ -14958,27 +14951,18 @@
 
                 // Perform predictive analytics
                 const seasonalityData = seasonalityAnalytics?.categoryResults || null;
-                console.log('seasonalityData available:', seasonalityData ? 'yes' : 'no');
-                console.log('Calling predictiveAnalyticsAnalyzer.performForecastingAnalysis...');
-
                 const predictiveResults = predictiveAnalyticsAnalyzer.performForecastingAnalysis(filteredData, seasonalityData);
 
-                console.log('predictiveResults:', predictiveResults);
-                console.log('predictiveResults is null?', predictiveResults === null);
-
                 if (!predictiveResults) {
-                    console.log('Predictive results is null - showing no data message');
                     if (predictiveContainer) predictiveContainer.style.display = 'none';
                     if (noPredictiveMessage) noPredictiveMessage.style.display = 'block';
                     return;
                 }
 
-                console.log('Predictive results received, showing container');
                 // Show predictive container and hide no data message
                 if (predictiveContainer) predictiveContainer.style.display = 'block';
                 if (noPredictiveMessage) noPredictiveMessage.style.display = 'none';
 
-                console.log('Calling display functions...');
                 // Display all sections
                 displayForecastSummary(predictiveResults.summary);
                 displayTotalSpendForecast(predictiveResults.totalSpendForecast);
@@ -14986,8 +14970,6 @@
                 displaySupplierForecasts(predictiveResults.supplierForecasts);
                 displayScenarioAnalysis(predictiveResults.scenarioAnalysis);
                 displayForecastAccuracy(predictiveResults.accuracyMetrics);
-
-                console.log('=== PREDICTIVE ANALYTICS DEBUG END ===');
 
             } catch (error) {
                 console.error('Error updating predictive analytics:', error);
@@ -15002,28 +14984,19 @@
         // Maverick Spend Analysis Display Functions
         function updateMaverickSpendAnalysis() {
             try {
-                console.log('=== MAVERICK SPEND ANALYSIS DEBUG START ===');
-                console.log('filteredData length:', filteredData ? filteredData.length : 'null/undefined');
-
                 const maverickContainer = safeGetElement('maverickContainer');
                 const noMaverickMessage = safeGetElement('noMaverickMessage');
 
                 if (!filteredData || filteredData.length === 0) {
-                    console.log('No filtered data available for maverick spend analysis');
                     if (maverickContainer) maverickContainer.style.display = 'none';
                     if (noMaverickMessage) noMaverickMessage.style.display = 'block';
                     return;
                 }
 
                 // Perform maverick spend analysis
-                console.log('Calling maverickSpendAnalyzer.performMaverickAnalysis...');
                 const maverickResults = maverickSpendAnalyzer.performMaverickAnalysis(filteredData);
 
-                console.log('maverickResults:', maverickResults);
-                console.log('maverickResults is null?', maverickResults === null);
-
                 if (!maverickResults || maverickResults.error) {
-                    console.log('Maverick results is null or has error - showing no data message');
                     if (maverickContainer) maverickContainer.style.display = 'none';
                     if (noMaverickMessage) noMaverickMessage.style.display = 'block';
                     return;
@@ -15039,8 +15012,6 @@
                 displayComplianceAlerts(maverickResults.alerts);
                 displayComplianceRecommendations(maverickResults.recommendations);
                 displaySupplierRiskMatrix(maverickResults.supplierProfiles);
-
-                console.log('=== MAVERICK SPEND ANALYSIS DEBUG END ===');
 
             } catch (error) {
                 console.error('Error updating maverick spend analysis:', error);
@@ -15412,28 +15383,19 @@
         // Contract Optimization Analysis Display Functions
         function updateContractOptimizationAnalysis() {
             try {
-                console.log('=== CONTRACT OPTIMIZATION ANALYSIS DEBUG START ===');
-                console.log('filteredData length:', filteredData ? filteredData.length : 'null/undefined');
-
                 const contractsContainer = safeGetElement('contractsContainer');
                 const noContractsMessage = safeGetElement('noContractsMessage');
 
                 if (!filteredData || filteredData.length === 0) {
-                    console.log('No filtered data available for contract optimization analysis');
                     if (contractsContainer) contractsContainer.style.display = 'none';
                     if (noContractsMessage) noContractsMessage.style.display = 'block';
                     return;
                 }
 
                 // Perform contract optimization analysis
-                console.log('Calling contractOptimizationAnalyzer.performContractAnalysis...');
                 const contractResults = contractOptimizationAnalyzer.performContractAnalysis(filteredData);
 
-                console.log('contractResults:', contractResults);
-                console.log('contractResults is null?', contractResults === null);
-
                 if (!contractResults || contractResults.error) {
-                    console.log('Contract results is null or has error - showing no data message');
                     if (contractsContainer) contractsContainer.style.display = 'none';
                     if (noContractsMessage) noContractsMessage.style.display = 'block';
                     return;
@@ -15451,8 +15413,6 @@
                 displayContractOptimizationOpportunities(contractResults.optimizationOpportunities);
                 displayContractRiskAssessment(contractResults.riskAssessment);
                 displayContractRecommendations(contractResults.recommendations);
-
-                console.log('=== CONTRACT OPTIMIZATION ANALYSIS DEBUG END ===');
 
             } catch (error) {
                 console.error('Error updating contract optimization analysis:', error);
@@ -16249,37 +16209,22 @@
 
         // Apply year-over-year comparison
         function applyYoYComparison() {
-            console.log('=== applyYoYComparison called ===');
             const year1Select = document.getElementById('yoyYear1');
             const year2Select = document.getElementById('yoyYear2');
 
-            console.log('year1Select:', year1Select);
-            console.log('year2Select:', year2Select);
-
             if (!year1Select || !year2Select) {
-                console.log('Year selects not found - returning');
                 return;
             }
 
             const year1 = parseInt(year1Select.value);
             const year2 = parseInt(year2Select.value);
 
-            console.log('year1:', year1);
-            console.log('year2:', year2);
-
             if (year1 === year2) {
-                console.log('Years are the same - showing alert');
                 alert('Please select two different fiscal years for comparison.');
                 return;
             }
 
-            console.log('seasonalityAnalytics:', seasonalityAnalytics);
-            console.log('seasonalityAnalytics.availableYears:', seasonalityAnalytics?.availableYears);
-            console.log('filteredData length:', filteredData?.length);
-
             if (!seasonalityAnalytics || !filteredData || filteredData.length === 0) {
-                console.log('No seasonalityAnalytics or filteredData - showing no data message');
-                // Show friendly message instead of alert
                 const noDataMessage = safeGetElement('yoyNoDataMessage');
                 const contentContainer = safeGetElement('yoyContentContainer');
                 if (noDataMessage) noDataMessage.style.display = 'block';
@@ -16289,12 +16234,10 @@
 
             // Check if selected years are in availableYears
             if (!seasonalityAnalytics.availableYears.includes(year1) || !seasonalityAnalytics.availableYears.includes(year2)) {
-                console.log('One or both years not in availableYears - showing alert');
                 alert('One or both selected fiscal years do not have data available. Please check the year selections.');
                 return;
             }
 
-            console.log('All checks passed - calling calculateAndDisplayYoYComparison');
             // Calculate and display YoY comparison
             calculateAndDisplayYoYComparison(year1, year2);
         }
@@ -16314,33 +16257,19 @@
 
         // Calculate and display year-over-year comparison
         function calculateAndDisplayYoYComparison(year1, year2) {
-            console.log('=== calculateAndDisplayYoYComparison called ===');
-            console.log('year1:', year1, 'year2:', year2);
             try {
                 // Get data for both years
-                console.log('Filtering data by fiscal year...');
-                console.log('filteredData sample:', filteredData[0]);
-                console.log('seasonalityAnalyzer:', seasonalityAnalyzer);
-
                 const year1Data = filteredData.filter(row => seasonalityAnalyzer.getFiscalYear(row.date) === year1);
                 const year2Data = filteredData.filter(row => seasonalityAnalyzer.getFiscalYear(row.date) === year2);
 
-                console.log('year1Data length:', year1Data.length);
-                console.log('year2Data length:', year2Data.length);
-
                 if (year1Data.length === 0 || year2Data.length === 0) {
-                    console.error('No data found for one or both years!');
                     alert('No data found for the selected years.');
                     return;
                 }
 
                 // Calculate metrics for both years
-                console.log('Calculating metrics...');
                 const year1Metrics = calculateYearMetrics(year1Data);
                 const year2Metrics = calculateYearMetrics(year2Data);
-
-                console.log('year1Metrics:', year1Metrics);
-                console.log('year2Metrics:', year2Metrics);
 
                 // Calculate YoY changes
                 const yoyMetrics = {
@@ -17037,46 +16966,24 @@
             const noDataMessage = safeGetElement('yoyNoDataMessage');
             const contentContainer = safeGetElement('yoyContentContainer');
 
-            // Debug logging
-            console.log('initializeYoYSelectors called');
-            console.log('noDataMessage element:', noDataMessage);
-            console.log('contentContainer element:', contentContainer);
-            console.log('seasonalityAnalytics:', seasonalityAnalytics);
-            console.log('availableYears:', seasonalityAnalytics?.availableYears);
-
             if (!seasonalityAnalytics || !seasonalityAnalytics.availableYears || seasonalityAnalytics.availableYears.length === 0) {
-                // Show no data message, hide content
                 if (noDataMessage) noDataMessage.style.display = 'block';
                 if (contentContainer) contentContainer.style.display = 'none';
-                console.log('No data available for YoY comparison');
                 return;
             }
 
-            const years = seasonalityAnalytics.availableYears.sort((a, b) => b - a); // Sort descending (newest first)
-
-            console.log('Years sorted:', years);
+            const years = seasonalityAnalytics.availableYears.sort((a, b) => b - a);
 
             const year1Select = safeGetElement('yoyYear1');
             const year2Select = safeGetElement('yoyYear2');
 
-            console.log('year1Select:', year1Select);
-            console.log('year2Select:', year2Select);
-
             if (!year1Select || !year2Select) {
-                console.log('Year selectors not found!');
                 return;
             }
 
-            console.log('Hiding no data message, showing content...');
             // Hide no data message, show content
-            if (noDataMessage) {
-                noDataMessage.style.display = 'none';
-                console.log('No data message hidden');
-            }
-            if (contentContainer) {
-                contentContainer.style.display = 'block';
-                console.log('Content container shown');
-            }
+            if (noDataMessage) noDataMessage.style.display = 'none';
+            if (contentContainer) contentContainer.style.display = 'block';
 
             // Clear existing options
             year1Select.innerHTML = '';
