@@ -6597,78 +6597,79 @@
                         </div>
                     </div>
 
-                <!-- Category Comparison Section -->
-                <div class="yoy-category-section" style="margin-bottom: 30px;">
-                    <h3 style="margin-bottom: 20px; color: #2c3e50;">📈 Category Comparison</h3>
+                    <!-- Category Comparison Section -->
+                    <div class="yoy-category-section" style="margin-bottom: 30px;">
+                        <h3 style="margin-bottom: 20px; color: #2c3e50;">📈 Category Comparison</h3>
 
-                    <!-- Distribution Pie Charts Side-by-Side -->
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 30px;">
-                        <div class="chart-wrapper" style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                            <h4 id="yoyPie1Title" style="text-align: center; color: #495057; margin-bottom: 15px;">FY2024 Distribution</h4>
-                            <canvas id="yoyPieChart1" style="max-height: 300px;"></canvas>
-                        </div>
-                        <div class="chart-wrapper" style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                            <h4 id="yoyPie2Title" style="text-align: center; color: #495057; margin-bottom: 15px;">FY2025 Distribution</h4>
-                            <canvas id="yoyPieChart2" style="max-height: 300px;"></canvas>
-                        </div>
-                    </div>
-
-                    <!-- Category Growth Bar Chart -->
-                    <div class="chart-wrapper" style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                        <h4 style="text-align: center; color: #495057; margin-bottom: 15px;">Category Growth Analysis (Sorted by Growth %)</h4>
-                        <canvas id="yoyCategoryGrowthChart" style="max-height: 400px;"></canvas>
-                    </div>
-                </div>
-
-                <!-- Monthly Comparison Section -->
-                <div class="yoy-monthly-section" style="margin-bottom: 30px;">
-                    <h3 style="margin-bottom: 20px; color: #2c3e50;">📅 Monthly Spending Comparison</h3>
-
-                    <!-- Side-by-Side Line Chart -->
-                    <div class="chart-wrapper" style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 20px;">
-                        <canvas id="yoyMonthlyLineChart" style="max-height: 400px;"></canvas>
-                    </div>
-
-                    <!-- Monthly Growth Rate Bar Chart -->
-                    <div class="chart-wrapper" style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                        <h4 style="text-align: center; color: #495057; margin-bottom: 15px;">Month-over-Month Growth Rate</h4>
-                        <canvas id="yoyMonthlyGrowthChart" style="max-height: 300px;"></canvas>
-                    </div>
-                </div>
-
-                <!-- Top Movers Section -->
-                <div class="yoy-movers-section" style="margin-bottom: 30px;">
-                    <h3 style="margin-bottom: 20px; color: #2c3e50;">🔝 Top Movers</h3>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
-                        <!-- Top Gainers -->
-                        <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                            <h4 style="color: #28a745; margin-bottom: 15px;">📈 Top Gainers</h4>
-                            <div id="yoyTopGainers">
-                                <!-- Will be populated by JavaScript -->
+                        <!-- Distribution Pie Charts Side-by-Side -->
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 30px;">
+                            <div class="chart-wrapper" style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                                <h4 id="yoyPie1Title" style="text-align: center; color: #495057; margin-bottom: 15px;">FY2024 Distribution</h4>
+                                <canvas id="yoyPieChart1" style="max-height: 300px;"></canvas>
+                            </div>
+                            <div class="chart-wrapper" style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                                <h4 id="yoyPie2Title" style="text-align: center; color: #495057; margin-bottom: 15px;">FY2025 Distribution</h4>
+                                <canvas id="yoyPieChart2" style="max-height: 300px;"></canvas>
                             </div>
                         </div>
-                        <!-- Top Decliners -->
-                        <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                            <h4 style="color: #dc3545; margin-bottom: 15px;">📉 Top Decliners</h4>
-                            <div id="yoyTopDecliners">
-                                <!-- Will be populated by JavaScript -->
+
+                        <!-- Category Growth Bar Chart -->
+                        <div class="chart-wrapper" style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                            <h4 style="text-align: center; color: #495057; margin-bottom: 15px;">Category Growth Analysis (Sorted by Growth %)</h4>
+                            <canvas id="yoyCategoryGrowthChart" style="max-height: 400px;"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Monthly Comparison Section -->
+                    <div class="yoy-monthly-section" style="margin-bottom: 30px;">
+                        <h3 style="margin-bottom: 20px; color: #2c3e50;">📅 Monthly Spending Comparison</h3>
+
+                        <!-- Side-by-Side Line Chart -->
+                        <div class="chart-wrapper" style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 20px;">
+                            <canvas id="yoyMonthlySpendChart" style="max-height: 400px;"></canvas>
+                        </div>
+
+                        <!-- Monthly Growth Rate Bar Chart -->
+                        <div class="chart-wrapper" style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                            <h4 style="text-align: center; color: #495057; margin-bottom: 15px;">Month-over-Month Growth Rate</h4>
+                            <canvas id="yoyMonthlyGrowthChart" style="max-height: 300px;"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Top Movers Section -->
+                    <div class="yoy-movers-section" style="margin-bottom: 30px;">
+                        <h3 style="margin-bottom: 20px; color: #2c3e50;">🔝 Top Movers</h3>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+                            <!-- Top Gainers -->
+                            <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                                <h4 style="color: #28a745; margin-bottom: 15px;">📈 Top Gainers</h4>
+                                <div id="yoyTopGainers">
+                                    <!-- Will be populated by JavaScript -->
+                                </div>
+                            </div>
+                            <!-- Top Decliners -->
+                            <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                                <h4 style="color: #dc3545; margin-bottom: 15px;">📉 Top Decliners</h4>
+                                <div id="yoyTopDecliners">
+                                    <!-- Will be populated by JavaScript -->
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- Supplier Comparison Section -->
-                <div class="yoy-supplier-section" style="margin-bottom: 30px;">
-                    <h3 style="margin-bottom: 20px; color: #2c3e50;">🏢 Top Suppliers Comparison</h3>
-                    <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                        <div id="yoySupplierTable" style="overflow-x: auto;">
-                            <!-- Table will be populated by JavaScript -->
+                    <!-- Supplier Comparison Section -->
+                    <div class="yoy-supplier-section" style="margin-bottom: 30px;">
+                        <h3 style="margin-bottom: 20px; color: #2c3e50;">🏢 Top Suppliers Comparison</h3>
+                        <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                            <div id="yoySupplierTable" style="overflow-x: auto;">
+                                <!-- Table will be populated by JavaScript -->
+                            </div>
                         </div>
                     </div>
-                </div>
                 </div>
                 <!-- End of YoY Content Container -->
             </div>
+            <!-- End of YoY Tab -->
 
             <!-- Tail Spend Analysis Tab -->
             <div id="tailspend" class="tab-content">
@@ -16993,23 +16994,46 @@
             const noDataMessage = safeGetElement('yoyNoDataMessage');
             const contentContainer = safeGetElement('yoyContentContainer');
 
+            // Debug logging
+            console.log('initializeYoYSelectors called');
+            console.log('noDataMessage element:', noDataMessage);
+            console.log('contentContainer element:', contentContainer);
+            console.log('seasonalityAnalytics:', seasonalityAnalytics);
+            console.log('availableYears:', seasonalityAnalytics?.availableYears);
+
             if (!seasonalityAnalytics || !seasonalityAnalytics.availableYears || seasonalityAnalytics.availableYears.length === 0) {
                 // Show no data message, hide content
                 if (noDataMessage) noDataMessage.style.display = 'block';
                 if (contentContainer) contentContainer.style.display = 'none';
+                console.log('No data available for YoY comparison');
                 return;
             }
 
             const years = seasonalityAnalytics.availableYears.sort((a, b) => b - a); // Sort descending (newest first)
 
+            console.log('Years sorted:', years);
+
             const year1Select = safeGetElement('yoyYear1');
             const year2Select = safeGetElement('yoyYear2');
 
-            if (!year1Select || !year2Select) return;
+            console.log('year1Select:', year1Select);
+            console.log('year2Select:', year2Select);
 
+            if (!year1Select || !year2Select) {
+                console.log('Year selectors not found!');
+                return;
+            }
+
+            console.log('Hiding no data message, showing content...');
             // Hide no data message, show content
-            if (noDataMessage) noDataMessage.style.display = 'none';
-            if (contentContainer) contentContainer.style.display = 'block';
+            if (noDataMessage) {
+                noDataMessage.style.display = 'none';
+                console.log('No data message hidden');
+            }
+            if (contentContainer) {
+                contentContainer.style.display = 'block';
+                console.log('Content container shown');
+            }
 
             // Clear existing options
             year1Select.innerHTML = '';
