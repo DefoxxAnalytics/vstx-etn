@@ -6579,13 +6579,23 @@
                     </div>
                 </div>
 
-                <!-- Key Metrics Comparison -->
-                <div class="yoy-metrics-section" style="margin-bottom: 30px;">
-                    <h3 style="margin-bottom: 20px; color: #2c3e50;">📊 Key Metrics Comparison</h3>
-                    <div id="yoyMetricsCards" class="yoy-metrics-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
-                        <!-- Metrics cards will be populated here -->
-                    </div>
+                <!-- No Data Message -->
+                <div id="yoyNoDataMessage" class="no-data-message" style="display: block; padding: 40px; text-align: center; background: #f8f9fa; border-radius: 8px; margin-bottom: 30px;">
+                    <div style="font-size: 3rem; margin-bottom: 15px;">📊</div>
+                    <h3 style="color: #6c757d; margin-bottom: 10px;">No Data Loaded</h3>
+                    <p style="color: #868e96; font-size: 1.1rem;">Please upload a CSV file with multi-year data to begin Year-over-Year comparison.</p>
+                    <p style="color: #868e96; margin-top: 10px;">Upload your file using the file selector at the top of the page.</p>
                 </div>
+
+                <!-- YoY Content Container (hidden until data is loaded) -->
+                <div id="yoyContentContainer" style="display: none;">
+                    <!-- Key Metrics Comparison -->
+                    <div class="yoy-metrics-section" style="margin-bottom: 30px;">
+                        <h3 style="margin-bottom: 20px; color: #2c3e50;">📊 Key Metrics Comparison</h3>
+                        <div id="yoyMetricsCards" class="yoy-metrics-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+                            <!-- Metrics cards will be populated here -->
+                        </div>
+                    </div>
 
                 <!-- Category Comparison Section -->
                 <div class="yoy-category-section" style="margin-bottom: 30px;">
@@ -6656,16 +6666,8 @@
                         </div>
                     </div>
                 </div>
-
-                <!-- No Data Message -->
-                <div class="seasonality-ready" id="noYoYMessage" style="display: none;">
-                    <div style="font-size: 3rem; margin-bottom: 20px;">📅</div>
-                    <h3>Year-over-Year Comparison Ready</h3>
-                    <p>Upload procurement data spanning multiple fiscal years to see year-over-year comparisons.</p>
-                    <p style="margin-top: 15px; font-size: 0.9rem;">
-                        <strong>Note:</strong> At least 2 fiscal years of data required for comparison.
-                    </p>
                 </div>
+                <!-- End of YoY Content Container -->
             </div>
 
             <!-- Tail Spend Analysis Tab -->
@@ -16238,8 +16240,15 @@
 
         // Apply year-over-year comparison
         function applyYoYComparison() {
-            const year1 = parseInt(document.getElementById('yoyYear1').value);
-            const year2 = parseInt(document.getElementById('yoyYear2').value);
+            const year1Select = document.getElementById('yoyYear1');
+            const year2Select = document.getElementById('yoyYear2');
+
+            if (!year1Select || !year2Select) {
+                return;
+            }
+
+            const year1 = parseInt(year1Select.value);
+            const year2 = parseInt(year2Select.value);
 
             if (year1 === year2) {
                 alert('Please select two different fiscal years for comparison.');
@@ -16247,13 +16256,17 @@
             }
 
             if (!seasonalityAnalytics || !seasonalityAnalytics.yearlyResults) {
-                alert('Please load data first.');
+                // Show friendly message instead of alert
+                const noDataMessage = safeGetElement('yoyNoDataMessage');
+                const contentContainer = safeGetElement('yoyContentContainer');
+                if (noDataMessage) noDataMessage.style.display = 'block';
+                if (contentContainer) contentContainer.style.display = 'none';
                 return;
             }
 
             // Check if selected years have data
             if (!seasonalityAnalytics.yearlyResults[year1] || !seasonalityAnalytics.yearlyResults[year2]) {
-                alert('One or both selected fiscal years do not have data available.');
+                alert('One or both selected fiscal years do not have data available. Please check the year selections.');
                 return;
             }
 
@@ -16977,7 +16990,13 @@
 
         // Initialize Year-over-Year selectors with available years
         function initializeYoYSelectors() {
+            const noDataMessage = safeGetElement('yoyNoDataMessage');
+            const contentContainer = safeGetElement('yoyContentContainer');
+
             if (!seasonalityAnalytics || !seasonalityAnalytics.availableYears || seasonalityAnalytics.availableYears.length === 0) {
+                // Show no data message, hide content
+                if (noDataMessage) noDataMessage.style.display = 'block';
+                if (contentContainer) contentContainer.style.display = 'none';
                 return;
             }
 
@@ -16987,6 +17006,10 @@
             const year2Select = safeGetElement('yoyYear2');
 
             if (!year1Select || !year2Select) return;
+
+            // Hide no data message, show content
+            if (noDataMessage) noDataMessage.style.display = 'none';
+            if (contentContainer) contentContainer.style.display = 'block';
 
             // Clear existing options
             year1Select.innerHTML = '';
@@ -17009,14 +17032,15 @@
             if (years.length >= 2) {
                 year1Select.value = years[0]; // Most recent year
                 year2Select.value = years[1]; // Previous year
+
+                // Auto-apply comparison if we have at least 2 years and the YoY tab is visible
+                const yoyTab = safeGetElement('yoycomparison');
+                if (yoyTab && yoyTab.classList.contains('active')) {
+                    applyYoYComparison();
+                }
             } else if (years.length === 1) {
                 year1Select.value = years[0];
                 year2Select.value = years[0];
-            }
-
-            // Auto-apply comparison if we have at least 2 years
-            if (years.length >= 2) {
-                applyYoYComparison();
             }
         }
 
