@@ -8135,15 +8135,15 @@
                 return {
                     categoryResults: results,
                     opportunities: opportunities,
-                    summary: this.generateSummary(results, opportunities),
+                    summary: this.generateSummary(results, opportunities, categories.length),
                     availableYears: this.availableYears,
                     multiYearEnabled: multiYear
                 };
             }
 
             // Generate executive summary
-            generateSummary(results, opportunities) {
-                const totalCategories = Object.keys(results).length;
+            generateSummary(results, opportunities, totalCategoriesAnalyzed = null) {
+                const totalCategories = totalCategoriesAnalyzed !== null ? totalCategoriesAnalyzed : Object.keys(results).length;
                 const highImpactOpportunities = opportunities.filter(o => o.impact === 'High').length;
                 const totalSavingsPotential = opportunities.reduce((sum, o) => sum + o.optimisticSavings, 0);
 
