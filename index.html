@@ -16314,14 +16314,33 @@
 
         // Calculate and display year-over-year comparison
         function calculateAndDisplayYoYComparison(year1, year2) {
+            console.log('=== calculateAndDisplayYoYComparison called ===');
+            console.log('year1:', year1, 'year2:', year2);
             try {
                 // Get data for both years
-                const year1Data = filteredData.filter(row => seasonalityAnalyzer.getFiscalYear(row['Creation Date']) === year1);
-                const year2Data = filteredData.filter(row => seasonalityAnalyzer.getFiscalYear(row['Creation Date']) === year2);
+                console.log('Filtering data by fiscal year...');
+                console.log('filteredData sample:', filteredData[0]);
+                console.log('seasonalityAnalyzer:', seasonalityAnalyzer);
+
+                const year1Data = filteredData.filter(row => seasonalityAnalyzer.getFiscalYear(row.date) === year1);
+                const year2Data = filteredData.filter(row => seasonalityAnalyzer.getFiscalYear(row.date) === year2);
+
+                console.log('year1Data length:', year1Data.length);
+                console.log('year2Data length:', year2Data.length);
+
+                if (year1Data.length === 0 || year2Data.length === 0) {
+                    console.error('No data found for one or both years!');
+                    alert('No data found for the selected years.');
+                    return;
+                }
 
                 // Calculate metrics for both years
+                console.log('Calculating metrics...');
                 const year1Metrics = calculateYearMetrics(year1Data);
                 const year2Metrics = calculateYearMetrics(year2Data);
+
+                console.log('year1Metrics:', year1Metrics);
+                console.log('year2Metrics:', year2Metrics);
 
                 // Calculate YoY changes
                 const yoyMetrics = {
@@ -16686,14 +16705,14 @@
             }
 
             year1Data.forEach(row => {
-                const date = new Date(row['Creation Date']);
+                const date = new Date(row.date);
                 const fiscalMonth = seasonalityAnalyzer.calendarToFiscalMonth(date.getMonth() + 1);
                 const amount = parseFloat(row[' Amount '] || 0);
                 year1Monthly[fiscalMonth] += amount;
             });
 
             year2Data.forEach(row => {
-                const date = new Date(row['Creation Date']);
+                const date = new Date(row.date);
                 const fiscalMonth = seasonalityAnalyzer.calendarToFiscalMonth(date.getMonth() + 1);
                 const amount = parseFloat(row[' Amount '] || 0);
                 year2Monthly[fiscalMonth] += amount;
