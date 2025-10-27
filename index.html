@@ -16373,9 +16373,9 @@
 
         // Calculate metrics for a year
         function calculateYearMetrics(data) {
-            const totalSpend = data.reduce((sum, row) => sum + parseFloat(row[' Amount '] || 0), 0);
+            const totalSpend = data.reduce((sum, row) => sum + parseFloat(row.amount || 0), 0);
             const transactionCount = data.length;
-            const suppliers = [...new Set(data.map(row => row['Supplier']))];
+            const suppliers = [...new Set(data.map(row => row.supplier))];
             const supplierCount = suppliers.length;
             const avgTransaction = totalSpend / transactionCount;
 
@@ -16485,14 +16485,14 @@
             const year2Categories = {};
 
             year1Data.forEach(row => {
-                const category = row['Category'] || 'Unknown';
-                const amount = parseFloat(row[' Amount '] || 0);
+                const category = row.category || 'Unknown';
+                const amount = parseFloat(row.amount || 0);
                 year1Categories[category] = (year1Categories[category] || 0) + amount;
             });
 
             year2Data.forEach(row => {
-                const category = row['Category'] || 'Unknown';
-                const amount = parseFloat(row[' Amount '] || 0);
+                const category = row.category || 'Unknown';
+                const amount = parseFloat(row.amount || 0);
                 year2Categories[category] = (year2Categories[category] || 0) + amount;
             });
 
@@ -16707,14 +16707,14 @@
             year1Data.forEach(row => {
                 const date = new Date(row.date);
                 const fiscalMonth = seasonalityAnalyzer.calendarToFiscalMonth(date.getMonth() + 1);
-                const amount = parseFloat(row[' Amount '] || 0);
+                const amount = parseFloat(row.amount || 0);
                 year1Monthly[fiscalMonth] += amount;
             });
 
             year2Data.forEach(row => {
                 const date = new Date(row.date);
                 const fiscalMonth = seasonalityAnalyzer.calendarToFiscalMonth(date.getMonth() + 1);
-                const amount = parseFloat(row[' Amount '] || 0);
+                const amount = parseFloat(row.amount || 0);
                 year2Monthly[fiscalMonth] += amount;
             });
 
@@ -16869,14 +16869,14 @@
             const year2Categories = {};
 
             year1Data.forEach(row => {
-                const category = row['Category'] || 'Unknown';
-                const amount = parseFloat(row[' Amount '] || 0);
+                const category = row.category || 'Unknown';
+                const amount = parseFloat(row.amount || 0);
                 year1Categories[category] = (year1Categories[category] || 0) + amount;
             });
 
             year2Data.forEach(row => {
-                const category = row['Category'] || 'Unknown';
-                const amount = parseFloat(row[' Amount '] || 0);
+                const category = row.category || 'Unknown';
+                const amount = parseFloat(row.amount || 0);
                 year2Categories[category] = (year2Categories[category] || 0) + amount;
             });
 
@@ -16964,14 +16964,14 @@
             const year2Suppliers = {};
 
             year1Data.forEach(row => {
-                const supplier = row['Supplier'] || 'Unknown';
-                const amount = parseFloat(row[' Amount '] || 0);
+                const supplier = row.supplier || 'Unknown';
+                const amount = parseFloat(row.amount || 0);
                 year1Suppliers[supplier] = (year1Suppliers[supplier] || 0) + amount;
             });
 
             year2Data.forEach(row => {
-                const supplier = row['Supplier'] || 'Unknown';
-                const amount = parseFloat(row[' Amount '] || 0);
+                const supplier = row.supplier || 'Unknown';
+                const amount = parseFloat(row.amount || 0);
                 year2Suppliers[supplier] = (year2Suppliers[supplier] || 0) + amount;
             });
 
