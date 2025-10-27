@@ -16249,22 +16249,36 @@
 
         // Apply year-over-year comparison
         function applyYoYComparison() {
+            console.log('=== applyYoYComparison called ===');
             const year1Select = document.getElementById('yoyYear1');
             const year2Select = document.getElementById('yoyYear2');
 
+            console.log('year1Select:', year1Select);
+            console.log('year2Select:', year2Select);
+
             if (!year1Select || !year2Select) {
+                console.log('Year selects not found - returning');
                 return;
             }
 
             const year1 = parseInt(year1Select.value);
             const year2 = parseInt(year2Select.value);
 
+            console.log('year1:', year1);
+            console.log('year2:', year2);
+
             if (year1 === year2) {
+                console.log('Years are the same - showing alert');
                 alert('Please select two different fiscal years for comparison.');
                 return;
             }
 
-            if (!seasonalityAnalytics || !seasonalityAnalytics.yearlyResults) {
+            console.log('seasonalityAnalytics:', seasonalityAnalytics);
+            console.log('seasonalityAnalytics.availableYears:', seasonalityAnalytics?.availableYears);
+            console.log('filteredData length:', filteredData?.length);
+
+            if (!seasonalityAnalytics || !filteredData || filteredData.length === 0) {
+                console.log('No seasonalityAnalytics or filteredData - showing no data message');
                 // Show friendly message instead of alert
                 const noDataMessage = safeGetElement('yoyNoDataMessage');
                 const contentContainer = safeGetElement('yoyContentContainer');
@@ -16273,12 +16287,14 @@
                 return;
             }
 
-            // Check if selected years have data
-            if (!seasonalityAnalytics.yearlyResults[year1] || !seasonalityAnalytics.yearlyResults[year2]) {
+            // Check if selected years are in availableYears
+            if (!seasonalityAnalytics.availableYears.includes(year1) || !seasonalityAnalytics.availableYears.includes(year2)) {
+                console.log('One or both years not in availableYears - showing alert');
                 alert('One or both selected fiscal years do not have data available. Please check the year selections.');
                 return;
             }
 
+            console.log('All checks passed - calling calculateAndDisplayYoYComparison');
             // Calculate and display YoY comparison
             calculateAndDisplayYoYComparison(year1, year2);
         }
